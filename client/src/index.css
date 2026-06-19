@@ -1,0 +1,497 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+
+.emoji-char, .reaction-emoji {
+  font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif !important;
+}
+
+/* ============================================
+   NEXMEET DESIGN TOKENS — DARK THEME (default)
+   ============================================ */
+:root,
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-primary:     #202124;
+  --bg-secondary:   #2D2E30;
+  --bg-surface:     #3C3D3F;
+  --bg-hover:       #4A4B4D;
+  --bg-active:      #525355;
+
+  /* Video area */
+  --bg-video:       #111111;
+  --bg-tile:        #2D2E30;
+
+  /* Text */
+  --text-primary:   #E8EAED;
+  --text-secondary: #9AA0A6;
+  --text-tertiary:  #5F6368;
+  --text-disabled:  #5F6368;
+  --text-inverse:   #1A1A2E;
+
+  /* Brand / Accent */
+  --accent:         #4285F4;
+  --accent-blue:    #1A73E8;
+  --accent-blue-hover: #1557B0;
+  --accent-blue-light: rgba(26, 115, 232, 0.15);
+  --accent-hover:   #5B9CF6;
+  --accent-danger:  #EA4335;
+  --accent-red:     #EA4335;
+  --accent-success: #34A853;
+  --accent-green:   #34A853;
+  --accent-warning: #FBBC04;
+  --accent-yellow:  #FBBC04;
+
+  /* Borders */
+  --border:           rgba(255,255,255,0.1);
+  --border-subtle:    rgba(255,255,255,0.08);
+  --border-default:   rgba(255,255,255,0.14);
+  --border-strong:    rgba(255,255,255,0.24);
+
+  /* Controls bar (meeting room) */
+  --controls-bg:      rgba(32, 33, 36, 0.95);
+  --control-btn-bg:   #3C4043;
+  --control-btn-hover: #4E5256;
+
+  /* Chat */
+  --chat-bg:          #2D2E30;
+  --chat-msg-self:    #174EA6;
+  --chat-msg-other:   #3C3D3F;
+  --chat-input-bg:    #3C3D3F;
+  --chat-bubble-own-bg: #174EA6;
+  --chat-bubble-own-text: #FFFFFF;
+  --chat-bubble-remote-bg: #3C3D3F;
+  --chat-bubble-remote-text: #E8EAED;
+
+  /* Sidebar / Panels */
+  --panel-bg:         #2D2E30;
+  --panel-header:     #202124;
+
+  /* White */
+  --white:            #FFFFFF;
+
+  /* Shadows */
+  --shadow-sm:        0 1px 4px rgba(0,0,0,0.4);
+  --shadow-md:        0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:        0 8px 32px rgba(0,0,0,0.6);
+
+  /* Typography */
+  --font-family: 'Roboto', 'Google Sans', 'Inter', sans-serif;
+}
+
+/* ============================================
+   NEXMEET DESIGN TOKENS — LIGHT THEME
+   ============================================ */
+[data-theme="light"],
+body.light-theme {
+  /* Backgrounds */
+  --bg-primary:     #F8F9FA;
+  --bg-secondary:   #FFFFFF;
+  --bg-surface:     #E8EAED;
+  --bg-hover:       #F1F3F4;
+  --bg-active:      #DADCE0;
+
+  /* Video area — keep dark for video quality */
+  --bg-video:       #202124;
+  --bg-tile:        #2D2E30;
+
+  /* Text */
+  --text-primary:   #202124;
+  --text-secondary: #5F6368;
+  --text-tertiary:  #9AA0A6;
+  --text-disabled:  #BDC1C6;
+  --text-inverse:   #FFFFFF;
+
+  /* Brand / Accent */
+  --accent:         #1A73E8;
+  --accent-blue:    #1A73E8;
+  --accent-blue-hover: #1557B0;
+  --accent-blue-light: rgba(26, 115, 232, 0.1);
+  --accent-hover:   #1557B0;
+  --accent-danger:  #D93025;
+  --accent-red:     #EA4335;
+  --accent-success: #188038;
+  --accent-green:   #34A853;
+  --accent-warning: #E37400;
+  --accent-yellow:  #FBBC04;
+
+  /* Borders */
+  --border:           rgba(0,0,0,0.08);
+  --border-subtle:    rgba(0,0,0,0.06);
+  --border-default:   rgba(0,0,0,0.12);
+  --border-strong:    rgba(0,0,0,0.22);
+
+  /* Controls bar */
+  --controls-bg:      rgba(255,255,255,0.96);
+  --control-btn-bg:   #F1F3F4;
+  --control-btn-hover: #E8EAED;
+
+  /* Chat */
+  --chat-bg:          #FFFFFF;
+  --chat-msg-self:    #1A73E8;
+  --chat-msg-other:   #F1F3F4;
+  --chat-input-bg:    #F8F9FA;
+  --chat-bubble-own-bg: #E8F0FE;
+  --chat-bubble-own-text: #174EA6;
+  --chat-bubble-remote-bg: #F1F3F4;
+  --chat-bubble-remote-text: #202124;
+
+  /* Sidebar / Panels */
+  --panel-bg:         #FFFFFF;
+  --panel-header:     #F8F9FA;
+
+  /* White */
+  --white:            #000000;
+
+  /* Shadows */
+  --shadow-sm:        0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md:        0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg:        0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* Global Reset & Base Elements */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Scrollbar Google Meet Style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Custom Text Selection */
+::selection {
+  background-color: var(--accent-blue-light);
+  color: #ffffff;
+}
+
+a, button, input, select, textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Global loader utility */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+[data-theme="light"] .spinner-small {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--accent-blue);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   GLOBAL DESIGN SYSTEM: MODALS & OVERLAYS
+   ========================================== */
+.google-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: googleModalFadeIn 0.2s ease-out;
+  padding: 20px;
+}
+
+.google-modal-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+  box-sizing: border-box;
+  animation: googleModalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: var(--text-primary);
+  position: relative;
+}
+
+.google-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.google-modal-header h3 {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.google-modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.google-modal-close-btn:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.google-modal-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.google-modal-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 16px;
+}
+
+.google-modal-link-text {
+  font-family: monospace;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  word-break: break-all;
+  user-select: all;
+}
+
+.google-modal-copy-btn {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.15s, color 0.15s;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+.google-modal-copy-btn:hover {
+  background-color: var(--accent-blue-light);
+}
+
+.google-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* ==========================================
+   GLOBAL DESIGN SYSTEM: PROFESSIONAL BUTTONS
+   ========================================== */
+.btn-google-primary {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 100px !important;
+  padding: 10px 24px !important;
+  height: 40px !important;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-google-primary:hover {
+  background-color: var(--accent-blue-hover) !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.35);
+}
+
+.btn-google-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.btn-google-secondary {
+  background-color: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 100px !important;
+  padding: 10px 24px !important;
+  height: 40px !important;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-google-secondary:hover {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--text-secondary) !important;
+  color: var(--text-primary) !important;
+  transform: translateY(-1.5px);
+}
+
+.btn-google-secondary:active {
+  transform: translateY(0);
+}
+
+/* Animations definition */
+@keyframes googleModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes googleModalScaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================
+   LIGHT THEME OVERRIDES (legacy body.light-theme + data-theme)
+   ========================================== */
+body.light-theme .google-modal-card,
+[data-theme="light"] .google-modal-card,
+body.light-theme .google-settings-modal-card,
+[data-theme="light"] .google-settings-modal-card {
+  background-color: #ffffff;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+body.light-theme .google-modal-header h3,
+[data-theme="light"] .google-modal-header h3 {
+  color: var(--text-primary);
+}
+
+body.light-theme .google-modal-desc,
+[data-theme="light"] .google-modal-desc {
+  color: var(--text-secondary);
+}
+
+body.light-theme .google-modal-link-box,
+[data-theme="light"] .google-modal-link-box {
+  background-color: var(--bg-surface);
+  border-color: var(--border);
+}
+
+body.light-theme .google-modal-link-text,
+[data-theme="light"] .google-modal-link-text {
+  color: var(--text-primary);
+}
+
+body.light-theme .google-modal-close-btn:hover,
+[data-theme="light"] .google-modal-close-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+body.light-theme .google-apps-dropdown,
+[data-theme="light"] .google-apps-dropdown {
+  background-color: #ffffff;
+  border-color: var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+body.light-theme .google-app-item,
+[data-theme="light"] .google-app-item {
+  color: var(--text-primary);
+}
+
+body.light-theme .google-app-item:hover,
+[data-theme="light"] .google-app-item:hover {
+  background-color: var(--bg-hover);
+}
+
+body.light-theme .google-faq-q,
+[data-theme="light"] .google-faq-q {
+  color: var(--text-primary);
+}
+
+body.light-theme .google-feedback-textarea,
+[data-theme="light"] .google-feedback-textarea {
+  background-color: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+body.light-theme .google-feedback-textarea:focus,
+[data-theme="light"] .google-feedback-textarea:focus {
+  border-color: var(--accent-blue);
+  background-color: #ffffff;
+}

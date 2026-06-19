@@ -1,0 +1,384 @@
+/* ========================================================
+   REDESIGNED CONTROLS BAR STYLING
+   ======================================================== */
+
+.custom-meeting-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  z-index: 250;
+  transition: all 0.3s ease;
+}
+
+/* GROUPS */
+.controls-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* VERTICAL DIVIDER */
+.vertical-controls-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 4px;
+  align-self: center;
+}
+
+/* SPLIT BUTTON WRAPPER */
+.btn-split-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* BUTTON BASICS */
+.btn-control-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.btn-control-circle span.material-icons-round {
+  font-size: 22px;
+}
+
+/* HOVER TRIGGERS */
+.btn-control-circle:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  transform: scale(1.05);
+}
+
+/* TOOLTIP INTERFACE */
+.btn-tooltip {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-control-circle:hover .btn-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* STATE HIGHLIGHTS */
+.btn-control-circle.active-off-red {
+  background: rgba(255, 59, 48, 0.85);
+  border-color: rgba(255, 59, 48, 0.3);
+  box-shadow: 0 4px 16px rgba(255, 59, 48, 0.3);
+}
+
+.btn-control-circle.active-off-red:hover {
+  background: rgba(255, 59, 48, 1);
+}
+
+.btn-control-circle.active-blue {
+  background: var(--color-blue);
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+.btn-control-circle.active-green {
+  background: var(--color-green);
+  border-color: rgba(48, 209, 88, 0.3);
+}
+
+/* CHEVRON SELECTORS */
+.btn-chevron-dropdown {
+  width: 20px;
+  height: 52px;
+  border-radius: 0 26px 26px 0;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-left: none;
+  color: var(--color-text-1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btn-chevron-dropdown span {
+  font-size: 16px;
+}
+
+.btn-chevron-dropdown:hover {
+  background: var(--color-surface-2);
+}
+
+.btn-split-wrapper .btn-control-circle {
+  border-radius: 26px 0 0 26px;
+}
+
+.btn-chevron-dropdown.dropdown-off-red {
+  background: rgba(255, 59, 48, 0.5);
+  border-color: rgba(255, 59, 48, 0.3);
+  border-left: none;
+}
+
+.btn-chevron-dropdown.dropdown-off-red:hover {
+  background: rgba(255, 59, 48, 0.65);
+}
+
+/* SELECTOR DROPDOWNS */
+.controls-selector-dropdown {
+  position: absolute;
+  bottom: 64px;
+  left: 0;
+  width: 240px;
+  background: var(--color-surface-1);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 20;
+  animation: slideUpFade 0.2s ease;
+}
+
+.controls-selector-dropdown h4 {
+  font-size: 12px;
+  color: var(--color-text-3);
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.selector-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+}
+
+.selector-item {
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.selector-item:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.selector-item.selected {
+  color: var(--color-blue);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.selector-item span.material-icons-round {
+  font-size: 18px;
+}
+
+.selector-item .label-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-devices {
+  font-size: 12px;
+  color: var(--color-text-4);
+  padding: 8px;
+  text-align: center;
+}
+
+/* EMOJI REACTION POPUP */
+.reaction-dropdown-anchor,
+.more-dropdown-anchor {
+  position: relative;
+}
+
+.floating-emoji-picker-box {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface-1);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: var(--shadow-md);
+  z-index: 20;
+}
+
+/* MORE OPTION DROPDOWN */
+.controls-more-options-dropdown {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  background: var(--color-surface-1);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 20;
+}
+
+.controls-more-options-dropdown button {
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.controls-more-options-dropdown button:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text-1);
+}
+
+.controls-more-options-dropdown button span {
+  font-size: 18px;
+  color: var(--color-text-3);
+}
+
+.back-to-options {
+  color: var(--color-blue) !important;
+}
+
+.back-to-options span {
+  color: var(--color-blue) !important;
+}
+
+.label-text-capitalize {
+  text-transform: capitalize;
+}
+
+/* LEAVE MEETING BUTTON */
+.btn-leave-call-gradient {
+  background: linear-gradient(135deg, #FF3B30, #FF2D20);
+  border: none;
+  border-radius: 100px;
+  padding: 0 24px;
+  height: 52px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.4);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-leave-call-gradient:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 24px rgba(255, 59, 48, 0.55);
+}
+
+.btn-leave-call-gradient:active {
+  transform: scale(1);
+}
+
+/* BADGES COUNTERS */
+.controls-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 2px solid var(--color-surface-1);
+}
+
+.controls-badge-count.count-red { background-color: var(--color-red); }
+.controls-badge-count.count-blue { background-color: var(--color-blue); }
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 768px) {
+  .custom-meeting-controls {
+    bottom: 12px;
+    padding: 8px 12px;
+    gap: 4px;
+    border-radius: 20px;
+  }
+  .btn-control-circle {
+    width: 42px;
+    height: 42px;
+  }
+  .btn-control-circle span {
+    font-size: 18px;
+  }
+  .btn-chevron-dropdown {
+    height: 42px;
+  }
+  .btn-leave-call-gradient {
+    height: 42px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+}

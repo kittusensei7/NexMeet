@@ -1,0 +1,319 @@
+/* ========================================================
+   REDESIGNED PARTICIPANTS DRAWER PANEL
+   ======================================================== */
+
+.google-participants-panel {
+  width: 360px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(20, 20, 22, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.4);
+  animation: slideFromRight 0.25s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+@keyframes slideFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* HEADER SECTION */
+.participants-header-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.participants-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+}
+
+.participants-title-row h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+}
+
+.participants-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.participants-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-3);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.participants-action-btn:hover,
+.participants-action-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.participants-action-btn span {
+  font-size: 18px;
+}
+
+/* SEARCH INPUT */
+.participants-search-bar {
+  margin-top: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.participants-search-field {
+  width: 100%;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0 36px 0 12px;
+  color: white;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.participants-search-field:focus {
+  border-color: var(--color-blue);
+  background: rgba(10, 132, 255, 0.06);
+}
+
+.search-clear-action {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear-action:hover {
+  color: white;
+}
+
+/* BODY SECTION */
+.participants-body-section {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.in-call-label {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  color: var(--color-text-4);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.participants-list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ROSTER ITEMS */
+.participant-row-tile {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+
+.participant-row-tile:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.participant-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.participant-row-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.participant-row-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.participant-name-text {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.host-indicator-chip {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--color-blue);
+  background: rgba(10, 132, 255, 0.12);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* STATUS & ACTIONS RIGHT */
+.participant-row-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.participant-indicator-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+}
+
+.participant-indicator-icon span {
+  font-size: 16px;
+}
+
+.participant-indicator-icon.mic.muted,
+.participant-indicator-icon.cam.off {
+  color: var(--color-red);
+}
+
+.participant-indicator-icon.hand {
+  color: var(--color-yellow);
+}
+
+/* ROW MENU */
+.participant-actions-anchor {
+  position: relative;
+}
+
+.row-menu-trigger-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-4);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.row-menu-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.row-menu-trigger-btn span {
+  font-size: 16px;
+}
+
+.participant-context-dropdown {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  width: 140px;
+  background: rgba(28, 28, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+.participant-context-dropdown button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text-2);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.1s;
+}
+
+.participant-context-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+}
+
+.participant-context-dropdown button span {
+  font-size: 16px;
+  color: var(--color-text-3);
+}
+
+.participants-empty-search {
+  font-size: 13px;
+  color: var(--color-text-4);
+  text-align: center;
+  margin-top: 32px;
+}
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 480px) {
+  .google-participants-panel {
+    width: 100%;
+  }
+}

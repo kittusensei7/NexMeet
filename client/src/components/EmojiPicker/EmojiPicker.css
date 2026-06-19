@@ -1,0 +1,143 @@
+.emoji-picker {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2D2E30;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: pickerSlideUp 0.2s ease;
+  z-index: 1000;
+  width: 280px;
+  box-sizing: border-box;
+}
+
+@keyframes pickerSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.emoji-picker-title {
+  margin: 0;
+  font-family: 'Google Sans', 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #9AA0A6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.emoji-picker-divider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+/* Scroll tray style for extended emojis */
+.emoji-grid.scroll-tray {
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom scrollbar for scroll tray */
+.emoji-grid.scroll-tray::-webkit-scrollbar {
+  width: 4px;
+}
+
+.emoji-grid.scroll-tray::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.emoji-grid.scroll-tray::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.emoji-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  position: relative;
+  box-sizing: border-box;
+  padding: 2px;
+  color: #ffffff;
+}
+
+.emoji-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.emoji-btn:active {
+  transform: scale(0.88);
+}
+
+.emoji-btn.on-cooldown {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.emoji-char {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.emoji-label {
+  font-size: 8px;
+  color: #9AA0A6;
+  font-family: 'Google Sans', 'Roboto', sans-serif;
+  margin-top: 2px;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* Circular cooldown progress ring overlay */
+.cooldown-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+
+.cooldown-ring-circle {
+  fill: none;
+  stroke: #1A73E8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.1s linear;
+}

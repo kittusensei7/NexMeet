@@ -302,7 +302,15 @@ const Lobby = () => {
   }
 
   return (
-    <div className="lobby-container-page">
+    <div style={{
+      width: '100%',
+      height: '100dvh',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch',
+      background: '#1C1C1E'
+    }}>
+      <div className="lobby-container-page" style={{ paddingBottom: '60px' }}>
       <Navbar />
 
       {/* Toast Alert */}
@@ -505,6 +513,7 @@ const Lobby = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

@@ -1,6 +1,7 @@
 import {
   useEffect, useRef, useState, useCallback
 } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import SimplePeer from 'simple-peer'
 import socket from '../../socket/socket'
@@ -26,6 +27,8 @@ const Room = () => {
   const username = localStorage.getItem('username')
     || user?.username || user?.email?.split('@')[0]
     || 'Guest'
+
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
 
   // ━━━━━━━━━━━━━━━━
   // REFS
@@ -739,6 +742,15 @@ const Room = () => {
   }, [roomId, username])
 
   const startScreenShare = useCallback(async () => {
+    // Check if screen share is supported
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      showToast(
+        'Screen sharing is not supported on this device. Please use a desktop browser.', 
+        'error'
+      )
+      return
+    }
+
     try {
       const screenStream = await
         navigator.mediaDevices.getDisplayMedia({
@@ -785,8 +797,13 @@ const Room = () => {
 
       screenTrack.onended = () => stopScreenShare()
 
-    } catch (e) {
-      if (e.name !== 'NotAllowedError') {
+    } catch (err) {
+      if (err.name === 'NotAllowedError') {
+        console.log('User cancelled')
+      } else if (err.name === 'NotSupportedError' || 
+                 err.name === 'NotFoundError') {
+        showToast('Screen sharing not available on this device', 'error')
+      } else {
         showToast('Screen share failed', 'error')
       }
     }
@@ -1112,31 +1129,64 @@ const Room = () => {
               add_reaction
             </span>
           </button>
-          {showEmoji && (
-            <div className="emoji-picker-popup" onClick={e => e.stopPropagation()}>
-              {['👍','❤️','😂','😮','👏','🎉','🔥','💯'].map(emoji => (
-                <button
-                  key={emoji}
-                  className="emoji-btn"
-                  onClick={() => {
-                    sendReaction(emoji)
-                    setShowEmoji(false)
-                  }}>
-                  {emoji}
-                </button>
-              ))}
-            </div>
+          {showEmoji && createPortal(
+            <div 
+              className="emoji-picker-popup"
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                bottom: '70px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: '#2C2C2E',
+                borderRadius: '16px',
+                padding: '10px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '6px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                zIndex: 2147483647, /* max z-index */
+                width: '260px'
+              }}>
+              {['👍','❤️','😂','😮','👏','🎉','🔥','💯']
+                .map(emoji => (
+                  <button
+                    key={emoji}
+                    style={{
+                      width: '50px',
+                      height: '50px',
+                      borderRadius: '10px',
+                      background: 'rgba(255,255,255,0.08)',
+                      border: 'none',
+                      fontSize: '22px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onClick={() => {
+                      sendReaction(emoji)
+                      setShowEmoji(false)
+                    }}>
+                    {emoji}
+                  </button>
+                ))}
+            </div>,
+            document.body
           )}
         </div>
 
-        <button 
-          className={`ctrl-btn ${isScreenSharing ? 'active' : ''}`}
-          onClick={isScreenSharing ? stopScreenShare : startScreenShare}
-          data-tooltip={isScreenSharing ? 'Stop sharing' : 'Share screen'}>
-          <span className="material-icons-round">
-            {isScreenSharing ? 'stop_screen_share' : 'screen_share'}
-          </span>
-        </button>
+        {!isMobile && (
+          <button 
+            className={`ctrl-btn ${isScreenSharing ? 'active' : ''}`}
+            onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+            data-tooltip={isScreenSharing ? 'Stop sharing' : 'Share screen'}>
+            <span className="material-icons-round">
+              {isScreenSharing ? 'stop_screen_share' : 'screen_share'}
+            </span>
+          </button>
+        )}
 
         <div style={{position:'relative', flexShrink: 0}}>
           <button 
@@ -1151,19 +1201,48 @@ const Room = () => {
               more_vert
             </span>
           </button>
-          {showMore && (
-            <div className="more-options-menu" onClick={e => e.stopPropagation()}>
-              <button onClick={() => {
-                navigator.clipboard.writeText(window.location.href)
-                showToast('Link copied!')
-                setShowMore(false)
+          {showMore && createPortal(
+            <div 
+              className="more-options-menu"
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                bottom: '70px',
+                right: '12px',
+                background: '#2C2C2E',
+                borderRadius: '12px',
+                padding: '8px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                zIndex: 2147483647,
+                minWidth: '200px'
               }}>
+              <button 
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '12px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'white',
+                  fontSize: '14px',
+                  borderRadius: '8px',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href)
+                  showToast('Link copied!')
+                  setShowMore(false)
+                }}>
                 <span className="material-icons-round">
                   link
                 </span>
                 Copy meeting link
               </button>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
 

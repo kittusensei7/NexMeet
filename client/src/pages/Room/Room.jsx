@@ -65,7 +65,7 @@ const Room = () => {
   const [isCaptionOn, setIsCaptionOn] =
     useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
-  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showMore, setShowMore] = useState(false)
   const [floatingEmojis, setFloatingEmojis] = useState([])
 
   // Compatibility states for JSX
@@ -631,6 +631,17 @@ const Room = () => {
     }
   }, [roomId, username])
 
+  useEffect(() => {
+    const closeAll = () => {
+      setShowEmoji(false)
+      setShowMore(false)
+    }
+    document.addEventListener('click', closeAll)
+    return () => {
+      document.removeEventListener('click', closeAll)
+    }
+  }, [])
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // CONTROLS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1050,149 +1061,144 @@ const Room = () => {
         </div>
       )}
 
-      {/* Meeting Footer (Google Meet / Zoom style bottom bar) */}
-      <div className="meeting-footer">
-        <div className="footer-left">
-          <span className="material-icons-round" style={{color:'#30D158',fontSize:'16px'}}>
-            lock
+      {/* Meeting Footer Controls Bar */}
+      <div className="controls-bar" onClick={e => e.stopPropagation()}>
+        <button 
+          className={`ctrl-btn ${isMuted ? 'danger' : ''}`}
+          onClick={toggleMute}
+          data-tooltip={isMuted ? 'Unmute' : 'Mute'}>
+          <span className="material-icons-round">
+            {isMuted ? 'mic_off' : 'mic'}
           </span>
-          <span className="room-id-text">{roomId}</span>
-          <span className="footer-divider" />
-          <span className="room-timer">{formatDuration(duration)}</span>
-        </div>
+        </button>
 
-        <div className="footer-center">
+        <button 
+          className={`ctrl-btn ${isCameraOff ? 'danger' : ''}`}
+          onClick={toggleCamera}
+          data-tooltip={isCameraOff ? 'Start video' : 'Stop video'}>
+          <span className="material-icons-round">
+            {isCameraOff ? 'videocam_off' : 'videocam'}
+          </span>
+        </button>
+
+        <button 
+          className={`ctrl-btn ${isCaptionOn ? 'active' : ''}`}
+          onClick={toggleCaptions}
+          data-tooltip="Captions">
+          <span className="material-icons-round">
+            closed_caption
+          </span>
+        </button>
+
+        <button 
+          className={`ctrl-btn ${isHandRaised ? 'active' : ''}`}
+          onClick={toggleHandRaise}
+          data-tooltip={isHandRaised ? 'Lower hand' : 'Raise hand'}>
+          <span className="material-icons-round">
+            {isHandRaised ? 'pan_tool' : 'back_hand'}
+          </span>
+        </button>
+
+        <div style={{position:'relative', flexShrink: 0}}>
           <button 
-            className={`ctrl-btn ${isMuted ? 'danger' : ''}`}
-            onClick={toggleMute}
-            data-tooltip={isMuted ? 'Unmute' : 'Mute'}>
+            className="ctrl-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowEmoji(p => !p)
+              setShowMore(false)
+            }}
+            data-tooltip="React">
             <span className="material-icons-round">
-              {isMuted ? 'mic_off' : 'mic'}
+              add_reaction
             </span>
           </button>
-
-          <button 
-            className={`ctrl-btn ${isCameraOff ? 'danger' : ''}`}
-            onClick={toggleCamera}
-            data-tooltip={isCameraOff ? 'Start video' : 'Stop video'}>
-            <span className="material-icons-round">
-              {isCameraOff ? 'videocam_off' : 'videocam'}
-            </span>
-          </button>
-
-          <button 
-            className={`ctrl-btn ${isCaptionOn ? 'active' : ''}`}
-            onClick={toggleCaptions}
-            data-tooltip="Captions">
-            <span className="material-icons-round">
-              closed_caption
-            </span>
-          </button>
-
-          <button 
-            className={`ctrl-btn ${isHandRaised ? 'active' : ''}`}
-            onClick={toggleHandRaise}
-            data-tooltip={isHandRaised ? 'Lower hand' : 'Raise hand'}>
-            <span className="material-icons-round">
-              {isHandRaised ? 'pan_tool' : 'back_hand'}
-            </span>
-          </button>
-
-          <div style={{position:'relative'}}>
-            <button 
-              className="ctrl-btn"
-              onClick={() => {
-                setShowEmoji(p => !p);
-                setShowMoreMenu(false);
-              }}
-              data-tooltip="React">
-              <span className="material-icons-round">
-                add_reaction
-              </span>
-            </button>
-            {showEmoji && (
-              <div className="emoji-picker-popup">
-                {['👍','❤️','😂','😮','👏','🎉','🔥','💯'].map(emoji => (
-                  <button
-                    key={emoji}
-                    className="emoji-btn"
-                    onClick={() => {
-                      sendReaction(emoji);
-                      setShowEmoji(false);
-                    }}>
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <button 
-            className={`ctrl-btn ${isScreenSharing ? 'active' : ''}`}
-            onClick={isScreenSharing ? stopScreenShare : startScreenShare}
-            data-tooltip={isScreenSharing ? 'Stop sharing' : 'Share screen'}>
-            <span className="material-icons-round">
-              {isScreenSharing ? 'stop_screen_share' : 'screen_share'}
-            </span>
-          </button>
-
-          <div style={{position:'relative'}}>
-            <button 
-              className={`ctrl-btn ${showMoreMenu ? 'active' : ''}`}
-              onClick={() => {
-                setShowMoreMenu(p => !p);
-                setShowEmoji(false);
-              }}
-              data-tooltip="More options">
-              <span className="material-icons-round">
-                more_vert
-              </span>
-            </button>
-            {showMoreMenu && (
-              <div className="more-options-dropdown">
-                <button onClick={() => { copyMeetingLink(); setShowMoreMenu(false); }}>
-                  <span className="material-icons-round">
-                    link
-                  </span>
-                  Copy meeting link
+          {showEmoji && (
+            <div className="emoji-picker-popup" onClick={e => e.stopPropagation()}>
+              {['👍','❤️','😂','😮','👏','🎉','🔥','💯'].map(emoji => (
+                <button
+                  key={emoji}
+                  className="emoji-btn"
+                  onClick={() => {
+                    sendReaction(emoji)
+                    setShowEmoji(false)
+                  }}>
+                  {emoji}
                 </button>
-              </div>
-            )}
-          </div>
-
-          <button 
-            className="leave-btn"
-            onClick={leaveMeeting}>
-            Leave call
-          </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="footer-right">
-          <button 
-            className={`ctrl-btn ${showParticipants ? 'active' : ''}`}
-            onClick={() => {
-              setShowParticipants(p => !p);
-              setShowChat(false);
-            }}
-            data-tooltip="Participants">
-            <span className="material-icons-round">people</span>
-            <span className="ctrl-badge">{peers.length + 1}</span>
-          </button>
+        <button 
+          className={`ctrl-btn ${isScreenSharing ? 'active' : ''}`}
+          onClick={isScreenSharing ? stopScreenShare : startScreenShare}
+          data-tooltip={isScreenSharing ? 'Stop sharing' : 'Share screen'}>
+          <span className="material-icons-round">
+            {isScreenSharing ? 'stop_screen_share' : 'screen_share'}
+          </span>
+        </button>
 
+        <div style={{position:'relative', flexShrink: 0}}>
           <button 
-            className={`ctrl-btn ${showChat ? 'active' : ''}`}
-            onClick={() => {
-              setShowChat(p => !p);
-              setShowParticipants(false);
-              setUnreadCount(0);
+            className="ctrl-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowMore(p => !p)
+              setShowEmoji(false)
             }}
-            data-tooltip="Chat">
-            <span className="material-icons-round">chat</span>
-            {unreadCount > 0 && (
-              <span className="ctrl-badge">{unreadCount}</span>
-            )}
+            data-tooltip="More options">
+            <span className="material-icons-round">
+              more_vert
+            </span>
           </button>
+          {showMore && (
+            <div className="more-options-menu" onClick={e => e.stopPropagation()}>
+              <button onClick={() => {
+                navigator.clipboard.writeText(window.location.href)
+                showToast('Link copied!')
+                setShowMore(false)
+              }}>
+                <span className="material-icons-round">
+                  link
+                </span>
+                Copy meeting link
+              </button>
+            </div>
+          )}
         </div>
+
+        <span className="ctrl-divider" />
+
+        <button 
+          className={`ctrl-btn ${showParticipants ? 'active' : ''}`}
+          onClick={() => {
+            setShowParticipants(p => !p)
+            setShowChat(false)
+          }}
+          data-tooltip="Participants">
+          <span className="material-icons-round">people</span>
+          <span className="ctrl-badge">{peers.length + 1}</span>
+        </button>
+
+        <button 
+          className={`ctrl-btn ${showChat ? 'active' : ''}`}
+          onClick={() => {
+            setShowChat(p => !p)
+            setShowParticipants(false)
+            setUnreadCount(0)
+          }}
+          data-tooltip="Chat">
+          <span className="material-icons-round">chat</span>
+          {unreadCount > 0 && (
+            <span className="ctrl-badge">{unreadCount}</span>
+          )}
+        </button>
+
+        <button 
+          className="leave-btn"
+          onClick={leaveMeeting}>
+          Leave call
+        </button>
       </div>
 
       {/* Chat panel */}

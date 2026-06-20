@@ -2,8 +2,13 @@
    REDESIGNED LOBBY / GREEN ROOM STYLING
    ======================================================== */
 
-.lobby-container-page {
+.lobby-container-page,
+.lobby-container {
   min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 40px;
   background-color: var(--bg-primary);
   background-image: 
     radial-gradient(

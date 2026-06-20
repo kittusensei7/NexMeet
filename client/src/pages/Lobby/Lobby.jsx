@@ -57,6 +57,15 @@ const Lobby = () => {
     localStreamRef.current = localStream;
   }, [localStream]);
 
+  useEffect(() => {
+    document.body.style.overflow = 'auto'
+    document.body.style.height = 'auto'
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.height = ''
+    }
+  }, [])
+
   // Validate Room exists on startup
   useEffect(() => {
     const checkRoomAndStartMedia = async () => {

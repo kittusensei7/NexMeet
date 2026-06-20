@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import api from '../../api/axios';
-import { getInitials, copyToClipboard } from '../../utils/helpers';
+import { getInitials } from '../../utils/helpers';
 import Loader from '../../components/Loader/Loader';
 import './Lobby.css';
 
@@ -35,6 +35,10 @@ const Lobby = () => {
   const [testCountdown, setTestCountdown] = useState(5);
   const [audioLevel, setAudioLevel] = useState(0); // 0 to 100
   const [toastMessage, setToastMessage] = useState('');
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
 
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -284,15 +288,6 @@ const Lobby = () => {
     }
   };
 
-  const handleCopyLink = async () => {
-    const fullLink = `${window.location.origin}/lobby/${roomId}`;
-    const success = await copyToClipboard(fullLink);
-    if (success) {
-      setToastMessage('Meeting link copied!');
-      setTimeout(() => setToastMessage(''), 3000);
-    }
-  };
-
   if (validating) {
     return <Loader message="Verifying room credentials..." />;
   }
@@ -471,19 +466,29 @@ const Lobby = () => {
               </button>
             </div>
 
-            {/* Invite Info block */}
-            <div className="lobby-invite-section">
-              <p>Invite others by sharing this room link:</p>
-              <div className="lobby-link-share-row">
-                <span className="share-url-text">
-                  {`meet.nexmeet.com/${roomId}`}
-                </span>
+            <div className="lobby-link-section">
+              <p className="lobby-link-label">
+                Share this link to invite others:
+              </p>
+              <div className="lobby-link-box">
+                <input 
+                  type="text"
+                  readOnly
+                  value={window.location.href}
+                  className="lobby-link-input"
+                  onClick={(e) => e.target.select()}
+                />
                 <button 
-                  className="btn-copy-invite-link"
-                  onClick={handleCopyLink}
-                  title="Copy link"
-                >
-                  <span className="material-icons-round">content_copy</span>
+                  className="lobby-copy-btn"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      window.location.href
+                    )
+                    showToast('Link copied!')
+                  }}>
+                  <span className="material-icons-round">
+                    content_copy
+                  </span>
                 </button>
               </div>
             </div>

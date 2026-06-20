@@ -65,6 +65,7 @@ const Room = () => {
   const [isCaptionOn, setIsCaptionOn] =
     useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [floatingEmojis, setFloatingEmojis] = useState([])
 
   // Compatibility states for JSX
@@ -90,6 +91,24 @@ const Room = () => {
       setToasts(p => p.filter(t => t.id !== id))
     }, 4000)
   }, [])
+
+  const copyMeetingLink = useCallback(() => {
+    const link = window.location.href
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        showToast('Meeting link copied! Share it with others', 'success')
+      })
+      .catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea')
+        textArea.value = link
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        showToast('Link copied!', 'success')
+      })
+  }, [showToast])
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // CORE: CREATE PEER
@@ -873,6 +892,28 @@ const Room = () => {
       ${screenSharingUser ? 'has-spotlight' : ''}
       ${hasSidebar ? 'has-sidebar' : ''}`}>
 
+      {/* Top Bar (Floating center) */}
+      <div className="room-top-bar">
+        <span className="material-icons-round" style={{color:'#30D158',fontSize:'16px'}}>
+          lock
+        </span>
+        <span className="room-id-text">{roomId}</span>
+        <span className="footer-divider" />
+        <span className="room-timer">{formatDuration(duration)}</span>
+      </div>
+
+      {/* Top Right Bar */}
+      <div className="room-top-right">
+        <button 
+          className="share-link-btn"
+          onClick={copyMeetingLink}>
+          <span className="material-icons-round" style={{fontSize:'16px'}}>
+            link
+          </span>
+          <span className="btn-text">Share link</span>
+        </button>
+      </div>
+
       {/* Entry Click-to-Join Overlay */}
       {!joinedMeeting && (
         <div className="join-meet-overlay">
@@ -1060,7 +1101,10 @@ const Room = () => {
           <div style={{position:'relative'}}>
             <button 
               className="ctrl-btn"
-              onClick={() => setShowEmoji(p => !p)}
+              onClick={() => {
+                setShowEmoji(p => !p);
+                setShowMoreMenu(false);
+              }}
               data-tooltip="React">
               <span className="material-icons-round">
                 add_reaction
@@ -1091,6 +1135,30 @@ const Room = () => {
               {isScreenSharing ? 'stop_screen_share' : 'screen_share'}
             </span>
           </button>
+
+          <div style={{position:'relative'}}>
+            <button 
+              className={`ctrl-btn ${showMoreMenu ? 'active' : ''}`}
+              onClick={() => {
+                setShowMoreMenu(p => !p);
+                setShowEmoji(false);
+              }}
+              data-tooltip="More options">
+              <span className="material-icons-round">
+                more_vert
+              </span>
+            </button>
+            {showMoreMenu && (
+              <div className="more-options-dropdown">
+                <button onClick={() => { copyMeetingLink(); setShowMoreMenu(false); }}>
+                  <span className="material-icons-round">
+                    link
+                  </span>
+                  Copy meeting link
+                </button>
+              </div>
+            )}
+          </div>
 
           <button 
             className="leave-btn"

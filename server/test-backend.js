@@ -201,7 +201,7 @@ function testSocketFlows(roomId) {
       }
     });
 
-    clientA.on('user-raised-hand', (data) => {
+    clientA.on('user-hand-status', (data) => {
       console.log('[Socket] Client A received raise-hand update:', data);
       if (data.username === 'Bob' && data.socketId) {
         raiseHandReceivedA = true;
@@ -255,7 +255,7 @@ function testSocketFlows(roomId) {
         }
       });
 
-      clientB.on('user-raised-hand', (data) => {
+      clientB.on('user-hand-status', (data) => {
         console.log('[Socket] Client B received raise-hand update:', data);
         if (data.username === 'Bob' && data.socketId) {
           raiseHandReceivedB = true;

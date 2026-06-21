@@ -10,15 +10,31 @@ import Loader from '../../components/Loader/Loader'
 import VideoTile from '../../components/VideoTile/VideoTile'
 import './Room.css'
 
-// ICE servers config
-const ICE_CONFIG = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-  ]
-}
+const ICE_SERVERS = [
+  {
+    urls: "stun:stun.relay.metered.ca:80",
+  },
+  {
+    urls: "turn:standard.relay.metered.ca:80",
+    username: "937b1cc1819bfc74abb1e2d5",
+    credential: "Iecng+xD+Msuqxob",
+  },
+  {
+    urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+    username: "937b1cc1819bfc74abb1e2d5",
+    credential: "Iecng+xD+Msuqxob",
+  },
+  {
+    urls: "turn:standard.relay.metered.ca:443",
+    username: "937b1cc1819bfc74abb1e2d5",
+    credential: "Iecng+xD+Msuqxob",
+  },
+  {
+    urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+    username: "937b1cc1819bfc74abb1e2d5",
+    credential: "Iecng+xD+Msuqxob",
+  },
+]
 
 const Room = () => {
   const { roomId } = useParams()
@@ -140,7 +156,9 @@ const Room = () => {
       initiator: isInitiator,
       stream: localStreamRef.current,
       trickle: true,
-      config: ICE_CONFIG,
+      config: {
+        iceServers: ICE_SERVERS
+      },
       offerOptions: {
         offerToReceiveAudio: true,
         offerToReceiveVideo: true

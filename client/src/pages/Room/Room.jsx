@@ -694,21 +694,86 @@ const Room = () => {
     })
   }, [roomId, username])
 
-  const toggleCamera = useCallback(() => {
+  const toggleCamera = useCallback(async () => {
     if (!localStreamRef.current) return
 
-    const videoTracks = localStreamRef.current.getVideoTracks()
-    if (!videoTracks.length) return
+    const videoTrack = localStreamRef.current
+      .getVideoTracks()[0]
 
-    const track = videoTracks[0]
-    track.enabled = !track.enabled
-    const off = !track.enabled
+    if (!videoTrack) return
 
-    setIsCameraOff(off)
-    socket.emit('camera-status', {
-      roomId, isCameraOff: off, username
-    })
-  }, [roomId, username])
+    const turningOn = !videoTrack.enabled
+
+    if (!turningOn) {
+      // Turning OFF - just disable, 
+      // this part works fine
+      videoTrack.enabled = false
+      setIsCameraOff(true)
+      socket.emit('camera-status', {
+        roomId, isCameraOff: true, username
+      })
+      return
+    }
+
+    // Turning ON - get a FRESH track
+    // to avoid frozen-frame bug
+    try {
+      console.log('[CAMERA] Getting fresh track...')
+      
+      const freshStream = await
+        navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        })
+
+      const freshTrack = 
+        freshStream.getVideoTracks()[0]
+
+      // Replace track in ALL peer connections
+      for (const [sid, { peer }] of
+           Object.entries(peersRef.current)) {
+        try {
+          const pc = peer._pc
+          if (!pc) continue
+          const sender = pc.getSenders()
+            .find(s => s.track?.kind === 'video')
+          if (sender) {
+            await sender.replaceTrack(freshTrack)
+            console.log('[CAMERA] Track replaced for:', sid)
+          }
+        } catch (err) {
+          console.error('[CAMERA] Replace error:', sid, err)
+        }
+      }
+
+      // Stop old track
+      videoTrack.stop()
+
+      // Update local stream with fresh track
+      localStreamRef.current.removeTrack(videoTrack)
+      localStreamRef.current.addTrack(freshTrack)
+
+      // Refresh local video element
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = 
+          localStreamRef.current
+        localVideoRef.current.play().catch(() => {})
+      }
+
+      setIsCameraOff(false)
+      socket.emit('camera-status', {
+        roomId, isCameraOff: false, username
+      })
+
+      console.log('[CAMERA] Successfully resumed')
+
+    } catch (err) {
+      console.error('[CAMERA] Failed to resume:', err)
+      showToast('Could not turn camera back on', 'error')
+    }
+  }, [roomId, username, showToast])
 
   const stopScreenShare = useCallback(async () => {
     try {

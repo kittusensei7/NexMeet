@@ -89,6 +89,27 @@ const Room = () => {
 
   // Compatibility states for JSX
   const [localStream, setLocalStream] = useState(null)
+
+  const setBitrateForPeer = (peer) => {
+    try {
+      const pc = peer._pc
+      if (!pc) return
+      const sender = pc.getSenders()
+        .find(s => s.track?.kind === 'video')
+      if (!sender) return
+
+      const params = sender.getParameters()
+      if (!params.encodings) params.encodings = [{}]
+      
+      params.encodings[0].maxBitrate = 600000 // 600kbps
+      params.encodings[0].maxFramerate = 24
+      
+      sender.setParameters(params).catch(() => {})
+    } catch (e) {
+      console.log('Bitrate set skipped:', e.message)
+    }
+  }
+
   const [isHandRaised, setIsHandRaised] = useState(false)
   const [joinedMeeting, setJoinedMeeting] = useState(false)
 
@@ -202,7 +223,8 @@ const Room = () => {
     })
 
     peer.on('connect', () => {
-      console.log(`[PEER] ✅ Connected: ${targetUsername}`)
+      console.log(`Connected: ${targetUsername}`)
+      setBitrateForPeer(peer)
     })
 
     peer.on('error', err => {
@@ -385,10 +407,9 @@ const Room = () => {
         const stream = await
           navigator.mediaDevices.getUserMedia({
             video: {
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-              frameRate: { ideal: 30 },
-              facingMode: 'user'
+              width: { ideal: 960, max: 1280 },
+              height: { ideal: 540, max: 720 },
+              frameRate: { ideal: 24, max: 30 }
             },
             audio: {
               echoCancellation: true,
@@ -723,8 +744,9 @@ const Room = () => {
       const freshStream = await
         navigator.mediaDevices.getUserMedia({
           video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: { ideal: 960, max: 1280 },
+            height: { ideal: 540, max: 720 },
+            frameRate: { ideal: 24, max: 30 }
           }
         })
 
@@ -1450,49 +1472,131 @@ const Room = () => {
 // SUB-COMPONENTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const ChatPanel = ({ messages, onSend, onClose, username }) => {
+function ChatPanel({ messages, onSend, onClose, username }) {
   const [text, setText] = useState('')
+  const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
   const handleSend = () => {
     if (!text.trim()) return
     onSend(text)
     setText('')
   }
+
   return (
-    <div className="side-panel">
-      <div className="panel-header">
-        <span className="panel-title">Chat</span>
-        <button className="panel-close" onClick={onClose}>
-          <span className="material-icons-round">close</span>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: '#16161A',
+      zIndex: 99999,
+      display: 'flex',
+      flexDirection: 'column',
+      width: '100%',
+      height: '100%'
+    }}>
+      {/* Header */}
+      <div style={{
+        flexShrink: 0,
+        padding: '16px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        <span style={{ color: 'white', fontSize: 18, fontWeight: 600 }}>
+          Chat
+        </span>
+        <button
+          onClick={onClose}
+          style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)', border: 'none',
+            color: 'white', fontSize: 18, cursor: 'pointer'
+          }}>
+          ✕
         </button>
       </div>
-      <div className="messages-area">
-        {messages.map((m) => {
-          const isMine = m.username === username || m.isSelf
-          return (
-            <div key={m.id} className="messages-bubble-container" style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <div className={`message-bubble ${isMine ? 'mine' : 'others'}`}>
-                <div className="message-meta">
-                  {m.username} • {m.time}
-                </div>
-                <div>{m.text}</div>
-              </div>
+
+      {/* Messages - scrollable, takes remaining space */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '12px 16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        minHeight: 0  /* CRITICAL: allows flex child to scroll */
+      }}>
+        {messages.length === 0 && (
+          <p style={{ color: '#666', textAlign: 'center', marginTop: 40 }}>
+            No messages yet. Say hi 👋
+          </p>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} style={{
+            alignSelf: m.isSelf ? 'flex-end' : 'flex-start',
+            maxWidth: '80%'
+          }}>
+            <div style={{ fontSize: 11, color: '#888', marginBottom: 2 }}>
+              {m.isSelf ? 'You' : m.username} · {m.time}
             </div>
-          )
-        })}
+            <div style={{
+              background: m.isSelf ? '#0A84FF' : 'rgba(255,255,255,0.1)',
+              color: 'white',
+              padding: '8px 12px',
+              borderRadius: 12,
+              fontSize: 14
+            }}>
+              {m.text}
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
       </div>
-      <div className="chat-input-area">
+
+      {/* Input - ALWAYS visible, fixed at bottom of this panel */}
+      <div style={{
+        flexShrink: 0,
+        padding: '10px 12px',
+        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+        borderTop: '1px solid rgba(255,255,255,0.1)',
+        display: 'flex',
+        gap: 8,
+        alignItems: 'center',
+        background: '#16161A'
+      }}>
         <input
           type="text"
-          className="chat-input"
-          placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSend()
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          placeholder="Type a message..."
+          style={{
+            flex: 1,
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            borderRadius: 24,
+            padding: '12px 16px',
+            color: 'white',
+            fontSize: 15,
+            outline: 'none'
           }}
         />
-        <button className="send-btn" onClick={handleSend}>
-          <span className="material-icons-round">send</span>
+        <button
+          onClick={handleSend}
+          style={{
+            width: 42, height: 42, borderRadius: '50%',
+            background: '#0A84FF', border: 'none',
+            color: 'white', fontSize: 18, cursor: 'pointer',
+            flexShrink: 0
+          }}>
+          ➤
         </button>
       </div>
     </div>

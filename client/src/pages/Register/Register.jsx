@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import './Register.css';
@@ -13,7 +13,6 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
-
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -21,32 +20,20 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-
-
-  const getPasswordStrength = () => {
-    if (!password) return '';
-    let strength = 'weak';
-    const hasNumbers = /\d/.test(password);
-    const hasSpecial = /\W/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-
-    if (password.length >= 6) {
-      if (hasNumbers || hasSpecial) {
-        strength = 'medium';
-      }
-      if (password.length >= 8 && hasNumbers && hasSpecial && hasUpper) {
-        strength = 'strong';
-      }
+  useEffect(() => {
+    // Silent background ping on register load to pre-warm Render server instances
+    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    if (serverUrl) {
+      fetch(`${serverUrl}/`).catch(() => {});
     }
-    return strength;
-  };
-
-  const passwordStrength = getPasswordStrength();
+  }, []);
 
   const handleValidation = () => {
     const tempErrors = {};
-    if (!username.trim()) {
-      tempErrors.username = 'Enter your name';
+    if (!username) {
+      tempErrors.username = 'Enter a username';
+    } else if (username.length < 3) {
+      tempErrors.username = 'Username must be at least 3 characters';
     }
     if (!email) {
       tempErrors.email = 'Enter an email';
@@ -58,9 +45,7 @@ const Register = () => {
     } else if (password.length < 6) {
       tempErrors.password = 'Password must be at least 6 characters';
     }
-    if (!confirmPassword) {
-      tempErrors.confirmPassword = 'Confirm your password';
-    } else if (confirmPassword !== password) {
+    if (password !== confirmPassword) {
       tempErrors.confirmPassword = 'Passwords do not match';
     }
     if (!agreeTerms) {
@@ -79,15 +64,15 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const response = await api.post('/api/auth/register', {
+      await api.post('/api/auth/register', {
         username,
         email,
         password
       });
 
-      setSuccessMessage(response.data.message || 'Account created! Redirecting to login...');
+      setSuccessMessage('Account created! Redirecting...');
       setTimeout(() => {
-        navigate('/login');
+        navigate('/dashboard', { replace: true });
       }, 1500);
     } catch (error) {
       console.error('Registration error:', error);
@@ -143,7 +128,7 @@ const Register = () => {
 
           <div className="card-title-block">
             <h2>Create Account</h2>
-            <p>Join NexMeet for free</p>
+            <p>Get started today</p>
           </div>
 
           {errorMessage && (
@@ -155,13 +140,13 @@ const Register = () => {
 
           {successMessage && (
             <div className="register-success-toast">
-              <span className="material-icons-round">check_circle_outline</span>
+              <span className="material-icons-round">check_circle</span>
               <span>{successMessage}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate autoComplete="off" className="register-form-inputs">
-            {/* Full Name */}
+            {/* Username Field */}
             <div className="input-wrapper">
               <span className="material-icons-round input-icon">person</span>
               <input
@@ -169,7 +154,7 @@ const Register = () => {
                 id="username"
                 name="username"
                 className={`input-field ${errors.username ? 'input-error' : ''}`}
-                placeholder="Full name"
+                placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
@@ -178,7 +163,7 @@ const Register = () => {
               {errors.username && <span className="field-error-msg">{errors.username}</span>}
             </div>
 
-            {/* Email Address */}
+            {/* Email Field */}
             <div className="input-wrapper">
               <span className="material-icons-round input-icon">email</span>
               <input
@@ -195,7 +180,7 @@ const Register = () => {
               {errors.email && <span className="field-error-msg">{errors.email}</span>}
             </div>
 
-            {/* Password */}
+            {/* Password Field */}
             <div className="input-wrapper">
               <span className="material-icons-round input-icon">lock</span>
               <input
@@ -209,18 +194,10 @@ const Register = () => {
                 disabled={loading}
                 autoComplete="new-password"
               />
-              {password && (
-                <div className="password-strength-indicator">
-                  <span className="strength-label">Strength: {passwordStrength}</span>
-                  <div className={`strength-meter strength-${passwordStrength}`}>
-                    <div className="strength-meter-bar"></div>
-                  </div>
-                </div>
-              )}
               {errors.password && <span className="field-error-msg">{errors.password}</span>}
             </div>
 
-            {/* Confirm Password */}
+            {/* Confirm Password Field */}
             <div className="input-wrapper">
               <span className="material-icons-round input-icon">lock</span>
               <input
@@ -259,8 +236,17 @@ const Register = () => {
                 type="submit"
                 className="btn-primary"
                 disabled={loading}
+                style={{
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
               >
-                {loading ? 'Creating...' : 'Register'}
+                {loading ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="loading-spinner small" />
+                    Registering...
+                  </span>
+                ) : 'Register'}
               </button>
 
               <div className="auth-switch-link">

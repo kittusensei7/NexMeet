@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
@@ -19,7 +19,13 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-
+  useEffect(() => {
+    // Silent background ping on login load to wake Render backend cold start
+    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    if (serverUrl) {
+      fetch(`${serverUrl}/`).catch(() => {});
+    }
+  }, []);
 
   const handleValidation = () => {
     const tempErrors = {};
@@ -51,7 +57,7 @@ const Login = () => {
       // Store in AuthContext (which uses sessionStorage now)
       login(user, token);
       
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       if (error.response && error.response.data && error.response.data.message) {
@@ -168,7 +174,12 @@ const Login = () => {
                 className="btn-primary"
                 disabled={loading}
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="loading-spinner small" />
+                    Signing in...
+                  </span>
+                ) : 'Sign In'}
               </button>
 
               <div className="auth-switch-link">

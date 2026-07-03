@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// Create Axios instance pointing to server URL
+// Create Axios instance pointing to server URL with 10 second timeout
 const api = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL || 'http://localhost:5000'
+  baseURL: import.meta.env.VITE_SERVER_URL || 'http://localhost:5000',
+  timeout: 10000
 });
 
 // Request Interceptor: Attach JWT token if present in sessionStorage

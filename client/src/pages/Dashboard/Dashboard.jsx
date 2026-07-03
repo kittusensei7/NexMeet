@@ -45,7 +45,7 @@ const Dashboard = () => {
   const [selectedMic, setSelectedMic] = useState('');
   const [selectedCamera, setSelectedCamera] = useState('');
   const [lightTheme, setLightTheme] = useState(() => {
-    return localStorage.getItem('nexmeet_theme') === 'light' || document.body.classList.contains('light-theme');
+    return localStorage.getItem('theme') === 'light' || document.documentElement.getAttribute('data-theme') === 'light';
   });
 
   const [toasts, setToasts] = useState([]);
@@ -140,21 +140,43 @@ const Dashboard = () => {
     }, 3000);
   }, []);
 
-  // Fetch recent rooms
+  // Fetch fresh rooms helper for updates/deletions
+  const fetchMyRooms = useCallback(async (showLoading = false) => {
+    if (showLoading) {
+      setLoadingRecent(true);
+    }
+    try {
+      const response = await api.get('/api/rooms/my-rooms');
+      setRecentRooms(response.data);
+    } catch (error) {
+      console.error('Failed to retrieve meetings:', error);
+      addToast('Failed to retrieve recent meetings.', 'error');
+    } finally {
+      setLoadingRecent(false);
+    }
+  }, [addToast]);
+
+  // Initial load
   useEffect(() => {
     let active = true;
-    const fetchRecentRooms = async () => {
+    const loadRooms = async () => {
       try {
         const response = await api.get('/api/rooms/my-rooms');
-        if (active) setRecentRooms(response.data);
+        if (active) {
+          setRecentRooms(response.data);
+        }
       } catch (error) {
-        console.error('Failed to retrieve meetings:', error);
+        console.error('Failed to load rooms:', error);
       } finally {
-        if (active) setLoadingRecent(false);
+        if (active) {
+          setLoadingRecent(false);
+        }
       }
     };
-    fetchRecentRooms();
-    return () => { active = false; };
+    loadRooms();
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Instant meeting handler
@@ -168,7 +190,7 @@ const Dashboard = () => {
       const { roomId } = response.data;
       addToast('Instant meeting created!', 'success');
       setTimeout(() => {
-        navigate(`/lobby/${roomId}`, { state: { showMeetingReady: true } });
+        navigate(`/lobby/${roomId}`, { replace: true, state: { showMeetingReady: true } });
       }, 1000);
     } catch (error) {
       console.error('Failed to create instant meeting:', error);
@@ -187,6 +209,7 @@ const Dashboard = () => {
         roomName: `${user?.username || 'Guest'}'s Scheduled Meeting` 
       });
       const { roomId } = response.data;
+      // Optimistic update of local state
       setRecentRooms((prev) => [
         {
           _id: Math.random().toString(),
@@ -230,7 +253,7 @@ const Dashboard = () => {
       if (response.data.valid) {
         addToast('Entering Lobby...', 'success');
         setTimeout(() => {
-          navigate(`/lobby/${cleanRoomId}`);
+          navigate(`/lobby/${cleanRoomId}`, { replace: true });
         }, 1000);
       }
     } catch (error) {
@@ -251,31 +274,28 @@ const Dashboard = () => {
     }
   };
 
-  const handleDeleteRoom = async (id) => {
-    // Optimistically remove from UI
-    setRecentRooms((prev) => prev.filter((r) => r.roomId !== id));
+  const deleteRoom = async (roomId) => {
+    // Optimistic update: remove from UI immediately
+    setRecentRooms(prev => prev.filter(r => r.roomId !== roomId));
     try {
-      await api.delete(`/api/rooms/${id}`);
+      await api.delete(`/api/rooms/${roomId}`);
       addToast('Meeting deleted permanently.', 'success');
     } catch (error) {
       console.error('Failed to delete room:', error);
-      // Rollback on failure by refetching
-      try {
-        const response = await api.get('/api/rooms/my-rooms');
-        setRecentRooms(response.data);
-      } catch { /* silently ignore rollback fetch failure */ }
-      addToast('Could not delete meeting. Please try again.', 'error');
+      // Rollback list fresh from database
+      fetchMyRooms(true);
+      addToast('Failed to delete meeting', 'error');
     }
   };
 
   const handleThemeChange = (theme) => {
     if (theme === 'light') {
-      document.body.classList.add('light-theme');
-      localStorage.setItem('nexmeet_theme', 'light');
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
       setLightTheme(true);
     } else {
-      document.body.classList.remove('light-theme');
-      localStorage.setItem('nexmeet_theme', 'dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
       setLightTheme(false);
     }
   };
@@ -451,7 +471,7 @@ const Dashboard = () => {
                     <div className="recent-tile-right">
                       <button 
                         className="btn-rejoin-pill"
-                        onClick={() => navigate(`/lobby/${room.roomId}`)}
+                        onClick={() => navigate(`/lobby/${room.roomId}`, { replace: true })}
                       >
                         Rejoin
                       </button>
@@ -465,7 +485,7 @@ const Dashboard = () => {
                         </button>
                         <button 
                           className="delete-log-btn"
-                          onClick={() => handleDeleteRoom(room.roomId)}
+                          onClick={() => deleteRoom(room.roomId)}
                           title="Delete permanently"
                         >
                           <span className="material-icons-round">delete_outline</span>
@@ -558,7 +578,7 @@ const Dashboard = () => {
                         onChange={(e) => setSelectedMic(e.target.value)}
                       >
                         {micDevices.map(d => (
-                          <option key={d.deviceId} value={d.deviceId}>{d.label || 'Microphone'}</option>
+                           <option key={d.deviceId} value={d.deviceId}>{d.label || 'Microphone'}</option>
                         ))}
                         {micDevices.length === 0 && <option value="">Default Microphone</option>}
                       </select>

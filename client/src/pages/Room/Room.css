@@ -78,7 +78,7 @@ html, body, #root {
 }
 
 .share-link-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--input-border);
   border-color: var(--border-medium);
 }
 
@@ -399,7 +399,7 @@ html, body, #root {
 }
 
 .panel-close:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--input-border);
 }
 
 .messages-area {
@@ -421,7 +421,7 @@ html, body, #root {
 }
 
 .message-bubble.others {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--input-bg);
   border: 1px solid var(--border-subtle);
   align-self: flex-start;
   border-radius: 4px 12px 12px 12px;
@@ -507,7 +507,7 @@ html, body, #root {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), #a855f7);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -551,7 +551,7 @@ html, body, #root {
 }
 
 .toast {
-  background: rgba(15, 23, 42, 0.97);
+  background: var(--bg-card);
   border: 1px solid var(--border-medium);
   border-radius: 12px;
   padding: 12px 16px;
@@ -824,7 +824,7 @@ html, body, #root {
   width: 100%;
   max-width: 420px;
   padding: 40px;
-  background: var(--card-bg);
+  background: var(--bg-card);
   border: var(--card-border);
   border-radius: var(--card-radius);
   text-align: center;
@@ -949,8 +949,29 @@ html, body, #root {
 
   /* Video grid adjust for smaller bottom bar */
   .video-grid-wrapper {
-    bottom: 60px;
-    padding: 60px 4px 70px 4px;
+    padding: 56px 4px 76px 4px;
+  }
+
+  /* 2 people on mobile: stack vertically for better face visibility */
+  .video-grid.grid-2 {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  /* 3-4 people: 2x2 is okay */
+  .video-grid.grid-3,
+  .video-grid.grid-4 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  
+  .video-tile {
+    border-radius: 8px;
+  }
+
+  .tile-name-label {
+    font-size: 11px;
+    padding: 3px 8px;
   }
 
   /* Top bar smaller on mobile */
@@ -1000,4 +1021,3 @@ html, body, #root {
     justify-content: center;
   }
 }
-

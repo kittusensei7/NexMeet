@@ -5,17 +5,12 @@ const ThemeContext = createContext();
 
 /**
  * ThemeProvider
- * Manages dark/light theme with localStorage persistence and OS preference detection.
+ * Manages dark/light theme with localStorage persistence.
  * Sets data-theme attribute on <html> element for CSS variable switching.
  */
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('nexmeet-theme');
-    if (saved === 'light' || saved === 'dark') return saved;
-    // Legacy key support
-    const legacy = localStorage.getItem('nexmeet_theme');
-    if (legacy === 'light' || legacy === 'dark') return legacy;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return localStorage.getItem('theme') || 'dark';
   });
 
   useEffect(() => {
@@ -26,11 +21,11 @@ export function ThemeProvider({ children }) {
     } else {
       document.body.classList.remove('light-theme');
     }
-    localStorage.setItem('nexmeet-theme', theme);
-    localStorage.setItem('nexmeet_theme', theme); // Legacy key
+    localStorage.setItem('theme', theme);
+    localStorage.setItem('nexmeet_theme', theme); // Legacy key support
   }, [theme]);
 
-  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+  const toggleTheme = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

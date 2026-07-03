@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -31,14 +32,17 @@ const ProtectedRoute = ({ children }) => {
  * Defines Router switch paths mapping to screens.
  */
 function App() {
-  useEffect(() => {
-    const theme = localStorage.getItem('nexmeet_theme');
-    if (theme === 'light') {
-      document.body.classList.add('light-theme');
-    } else {
-      document.body.classList.remove('light-theme');
-    }
+  useTheme();
 
+  useEffect(() => {
+    // Silent background ping on app load to wake up Render backend
+    const serverUrl = import.meta.env.VITE_SERVER_URL;
+    if (serverUrl) {
+      fetch(`${serverUrl}/`).catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
     const handlePopState = () => {
       window.location.reload();
     };

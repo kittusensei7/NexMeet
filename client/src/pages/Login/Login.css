@@ -5,6 +5,7 @@
 .login-container-page {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--bg-primary);
   background-image: 
     radial-gradient(
@@ -14,11 +15,11 @@
     ),
     radial-gradient(
       ellipse at 80% 20%,
-      rgba(16, 185, 129, 0.08) 0%,
+      var(--border-subtle) 0%,
       transparent 50%
     );
   font-family: var(--font-family);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* LEFT SIDE: HERO ILLUSTRATION */
@@ -28,7 +29,7 @@
   align-items: center;
   justify-content: center;
   padding: 48px;
-  border-right: 1px solid var(--border-medium);
+  border-right: 1px solid var(--border);
   position: relative;
 }
 
@@ -49,14 +50,14 @@
   background: var(--primary-glow);
   padding: 10px;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 24px var(--primary-glow);
 }
 
 .hero-logo-text {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -1px;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-tertiary) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-muted) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -87,8 +88,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-medium);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   padding: 8px 16px;
   border-radius: 100px;
   font-size: 14px;
@@ -97,8 +98,8 @@
 }
 
 .feature-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-medium);
+  background: var(--input-border);
+  border-color: var(--primary-hover);
   transform: translateY(-2px);
 }
 
@@ -113,27 +114,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 20px 16px;
 }
 
 .login-card-frosted {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   padding: var(--card-padding);
-  background: var(--card-bg);
+  background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: var(--card-border);
+  border: 1px solid var(--border);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
-  animation: fadeUp 0.8s cubic-bezier(.22,1,.36,1) both;
-  transition: var(--transition-normal);
-}
-
-.login-card-frosted:hover {
-  transform: translateY(-6px);
-  border-color: rgba(139,92,246,0.25);
-  box-shadow: 0 0 40px rgba(139,92,246,0.12);
+  animation: none; /* Removed heavy animations for instant perceived speed */
   transition: var(--transition-normal);
 }
 
@@ -168,7 +162,7 @@
 
 .card-title-block p {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 /* ERROR TOAST */
@@ -208,7 +202,7 @@
   left: 14px;
   top: 16px;
   font-size: 20px;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   pointer-events: none;
   transition: var(--transition-fast);
 }
@@ -216,8 +210,8 @@
 .input-field {
   width: 100%;
   height: 52px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid var(--border-medium);
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
   border-radius: var(--btn-radius);
   padding: 0 16px 0 44px;
   color: var(--text-primary);
@@ -227,13 +221,13 @@
 }
 
 .input-field::placeholder {
-  color: var(--text-tertiary);
+  color: var(--text-muted);
 }
 
 .input-field:focus {
   border-color: var(--primary);
   background: var(--primary-glow);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .input-field:focus + .input-icon {
@@ -263,7 +257,7 @@
   top: 16px;
   background: none;
   border: none;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -320,8 +314,8 @@
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 35px rgba(139, 92, 246, 0.40);
-  transition: var(--transition-normal);
+  box-shadow: 0 0 35px var(--primary-glow);
+  background: var(--primary-hover);
 }
 
 .btn-primary:active {
@@ -371,8 +365,40 @@
   .card-header-branding {
     display: flex;
   }
-  
+}
+
+@media (max-width: 480px) {
   .login-card-frosted {
-    padding: 32px 24px;
+    padding: 28px 20px;
+    border-radius: 16px;
+    box-shadow: none !important;
+    margin: 0;
+    border: none;
+    background: transparent;
   }
+
+  .card-title-block h2 {
+    font-size: 24px;
+  }
+
+  .input-field {
+    height: 50px;
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  }
+
+  .btn-primary {
+    height: 50px;
+    font-size: 16px;
+  }
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon { 
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 18px;
 }

@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import api from '../../api/axios';
 import { getInitials } from '../../utils/helpers';
-import Loader from '../../components/Loader/Loader';
 import './Lobby.css';
 
 /**
@@ -23,7 +22,10 @@ const Lobby = () => {
   const [micOn, setMicOn] = useState(true);
   const [cameraOn, setCameraOn] = useState(true);
   const [permissionError, setPermissionError] = useState(false);
-  const [validating, setValidating] = useState(true);
+  
+  // Validation verification states
+  const [verifying, setVerifying] = useState(true);
+  const [error, setError] = useState(null);
   
   // Custom display name state
   const [displayName, setDisplayName] = useState(user?.username || '');
@@ -35,6 +37,7 @@ const Lobby = () => {
   const [testCountdown, setTestCountdown] = useState(5);
   const [audioLevel, setAudioLevel] = useState(0); // 0 to 100
   const [toastMessage, setToastMessage] = useState('');
+  
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3000);
@@ -58,80 +61,126 @@ const Lobby = () => {
   }, [localStream]);
 
   useEffect(() => {
-    document.body.style.overflow = 'auto'
-    document.body.style.height = 'auto'
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
     return () => {
-      document.body.style.overflow = ''
-      document.body.style.height = ''
-    }
-  }, [])
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+    };
+  }, []);
 
   // Validate Room exists on startup
   useEffect(() => {
-    const checkRoomAndStartMedia = async () => {
+    const verifyRoom = async () => {
       try {
-        const response = await api.get(`/api/rooms/validate/${roomId}`);
-        if (response.data.valid) {
-          setRoomName(response.data.roomName);
-          setValidating(false);
-          
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: {
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                facingMode: "user"
-              },
-              audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                sampleRate: 44100
-              }
-            });
-            setLocalStream(stream);
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-            }
-            setPermissionError(false);
-          } catch (deviceError) {
-            console.warn('Lobby full media access failed, trying audio-only fallback:', deviceError);
-            try {
-              const audioStream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  sampleRate: 44100
-                }
-              });
-              setLocalStream(audioStream);
-              setCameraOn(false);
-              setPermissionError(false);
-            } catch (audioError) {
-              console.warn('Lobby audio-only fallback failed too. Proceeding with media off:', audioError);
-              const emptyStream = new MediaStream();
-              setLocalStream(emptyStream);
-              setMicOn(false);
-              setCameraOn(false);
-              setPermissionError(false); 
-            }
-          } finally {
-            setLoadingRoom(false);
-          }
+        setVerifying(true);
+        setError(null);
+
+        // Add 10 second timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => {
+          controller.abort();
+        }, 10000);
+
+        const res = await api.get(
+          `/api/rooms/validate/${roomId}`,
+          { signal: controller.signal }
+        );
+
+        clearTimeout(timeout);
+
+        if (res.data.valid) {
+          setRoomName(res.data.roomName);
+          setVerifying(false);
+        } else {
+          setError('Room not found or expired');
         }
-      } catch (error) {
-        console.error('Lobby room check failed:', error);
-        navigate('/dashboard');
+      } catch (err) {
+        if (err.name === 'AbortError' || 
+            err.code === 'ERR_CANCELED') {
+          setError(
+            'Connection is slow. ' +
+            'Please wait and try again.'
+          );
+        } else if (err.response?.status === 404) {
+          setError(
+            'This meeting no longer exists.'
+          );
+        } else {
+          setError(
+            'Could not connect. ' + 
+            'Check your internet and try again.'
+          );
+        }
+        setVerifying(false);
       }
     };
 
-    checkRoomAndStartMedia();
+    if (roomId) verifyRoom();
+  }, [roomId]);
 
+  // Capture user media once verification is successful
+  useEffect(() => {
+    if (verifying || error) return;
+
+    const startMedia = async () => {
+      try {
+        setLoadingRoom(true);
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'user' }, // FRONT camera preference
+            width: { ideal: 960, max: 1280 },
+            height: { ideal: 540, max: 720 },
+            frameRate: { ideal: 24, max: 30 }
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        setLocalStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setPermissionError(false);
+      } catch (deviceError) {
+        console.warn('Lobby full media access failed, trying audio-only fallback:', deviceError);
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          });
+          setLocalStream(audioStream);
+          setCameraOn(false);
+          setPermissionError(false);
+        } catch (audioError) {
+          console.warn('Lobby audio-only fallback failed too. Proceeding with media off:', audioError);
+          const emptyStream = new MediaStream();
+          setLocalStream(emptyStream);
+          setMicOn(false);
+          setCameraOn(false);
+          setPermissionError(false); 
+        }
+      } finally {
+        setLoadingRoom(false);
+      }
+    };
+
+    startMedia();
+  }, [verifying, error]);
+
+  // Stop tracks on unmount
+  useEffect(() => {
     return () => {
       if (localStreamRef.current && !isJoiningRef.current) {
         localStreamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [roomId, navigate]);
+  }, []);
 
   // Handle local video bind if camera gets turned back on
   useEffect(() => {
@@ -276,6 +325,7 @@ const Lobby = () => {
 
     try {
       navigate(`/room/${roomId}`, {
+        replace: true,
         state: {
           initialMicOn: micOn,
           initialCameraOn: cameraOn,
@@ -287,6 +337,7 @@ const Lobby = () => {
     } catch (e) {
       console.warn("Could not pass stream via state, utilizing global fallback:", e);
       navigate(`/room/${roomId}`, {
+        replace: true,
         state: {
           initialMicOn: micOn,
           initialCameraOn: cameraOn,
@@ -297,9 +348,59 @@ const Lobby = () => {
     }
   };
 
-  if (validating) {
-    return <Loader message="Verifying room credentials..." />;
-  }
+  if (verifying) return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'var(--bg-primary)',
+      gap: 20
+    }}>
+      <div className="loading-spinner" />
+      <p style={{ color: 'var(--text-muted)', 
+        fontSize: 16 }}>
+        Verifying room credentials...
+      </p>
+      <p style={{ color: 'var(--text-muted)', 
+        fontSize: 13 }}>
+        This may take a few seconds
+      </p>
+    </div>
+  );
+
+  if (error) return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'var(--bg-primary)',
+      gap: 20,
+      padding: 24
+    }}>
+      <span style={{ fontSize: 48 }}>❌</span>
+      <h2 style={{ color: 'white', 
+        textAlign: 'center' }}>
+        {error}
+      </h2>
+      <button 
+        onClick={() => navigate('/dashboard', { replace: true })}
+        style={{
+          background: 'var(--primary)',
+          color: 'white',
+          border: 'none',
+          padding: '12px 32px',
+          borderRadius: 100,
+          fontSize: 16,
+          cursor: 'pointer'
+        }}>
+        Go to Dashboard
+      </button>
+    </div>
+  );
 
   return (
     <div style={{
@@ -500,8 +601,8 @@ const Lobby = () => {
                   onClick={() => {
                     navigator.clipboard.writeText(
                       window.location.href
-                    )
-                    showToast('Link copied!')
+                    );
+                    showToast('Link copied!');
                   }}>
                   <span className="material-icons-round">
                     content_copy
@@ -512,8 +613,8 @@ const Lobby = () => {
           </div>
         </div>
       </div>
+      </div>
     </div>
-  </div>
   );
 };
 

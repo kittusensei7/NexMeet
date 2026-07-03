@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { getInitials } from '../../utils/helpers';
 import './Navbar.css';
 
@@ -17,30 +18,9 @@ const Navbar = ({ onToggleSidebar, onOpenSettings, currentDateTime }) => {
   const [showHelp, setShowHelp] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const [isLightTheme, setIsLightTheme] = useState(() => {
-    return localStorage.getItem('nexmeet_theme') === 'light' || document.body.classList.contains('light-theme');
-  });
-
-  const handleToggleTheme = () => {
-    const nextLightTheme = !isLightTheme;
-    setIsLightTheme(nextLightTheme);
-    if (nextLightTheme) {
-      document.body.classList.add('light-theme');
-      localStorage.setItem('nexmeet_theme', 'light');
-    } else {
-      document.body.classList.remove('light-theme');
-      localStorage.setItem('nexmeet_theme', 'dark');
-    }
-  };
-
-  useEffect(() => {
-    const storedTheme = localStorage.getItem('nexmeet_theme');
-    if (storedTheme === 'light') {
-      document.body.classList.add('light-theme');
-    } else if (storedTheme === 'dark') {
-      document.body.classList.remove('light-theme');
-    }
-  }, []);
+  const { theme, toggleTheme } = useTheme();
+  const isLightTheme = theme === 'light';
+  const handleToggleTheme = toggleTheme;
   
   // Feedback states
   const [rating, setRating] = useState(0);

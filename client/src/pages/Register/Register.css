@@ -5,19 +5,20 @@
 .register-container-page {
   display: flex;
   min-height: 100vh;
-  background-color: var(--color-bg);
+  min-height: 100dvh;
+  background-color: var(--bg-primary);
   background-image: 
     radial-gradient(
       ellipse at 20% 50%,
-      rgba(10, 132, 255, 0.15) 0%,
+      var(--primary-glow) 0%,
       transparent 60%
     ),
     radial-gradient(
       ellipse at 80% 20%,
-      rgba(48, 209, 88, 0.08) 0%,
+      var(--border-subtle) 0%,
       transparent 50%
     );
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-family);
   overflow-y: auto;
 }
 
@@ -28,7 +29,7 @@
   align-items: center;
   justify-content: center;
   padding: 48px;
-  border-right: 1px solid var(--color-border);
+  border-right: 1px solid var(--border);
   position: relative;
 }
 
@@ -45,18 +46,18 @@
 
 .hero-logo-icon {
   font-size: 44px;
-  color: var(--color-blue);
-  background: rgba(10, 132, 255, 0.1);
+  color: var(--primary);
+  background: var(--primary-glow);
   padding: 10px;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(10, 132, 255, 0.2);
+  box-shadow: 0 8px 24px var(--primary-glow);
 }
 
 .hero-logo-text {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -1px;
-  background: linear-gradient(135deg, #ffffff 0%, var(--color-text-3) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-muted) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -65,14 +66,14 @@
   font-size: 48px;
   font-weight: 800;
   line-height: 1.15;
-  color: var(--color-text-1);
+  color: var(--text-primary);
   margin-bottom: 20px;
   letter-spacing: -1.5px;
 }
 
 .hero-tagline {
   font-size: 18px;
-  color: var(--color-text-3);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 36px;
 }
@@ -87,24 +88,24 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--color-border);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
   padding: 8px 16px;
   border-radius: 100px;
   font-size: 14px;
-  color: var(--color-text-2);
-  transition: all 0.2s;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
 }
 
 .feature-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--color-border-strong);
+  background: var(--input-border);
+  border-color: var(--primary-hover);
   transform: translateY(-2px);
 }
 
 .feature-pill span.material-icons-round {
   font-size: 18px;
-  color: var(--color-blue);
+  color: var(--primary);
 }
 
 /* RIGHT SIDE: GLASS CARD */
@@ -113,18 +114,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px;
+  padding: 20px 16px;
 }
 
 .register-card-frosted {
   width: 100%;
-  max-width: 420px;
-  padding: 40px 48px;
-  background: rgba(44, 44, 46, 0.55);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  max-width: 440px;
+  padding: var(--card-padding);
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  animation: none; /* Removed heavy animations for instant perceived speed */
+  transition: var(--transition-normal);
 }
 
 .card-header-branding {
@@ -136,13 +140,13 @@
 
 .branding-logo {
   font-size: 28px;
-  color: var(--color-blue);
+  color: var(--primary);
 }
 
 .branding-title {
   font-size: 20px;
   font-weight: 700;
-  color: var(--color-text-1);
+  color: var(--text-primary);
 }
 
 .card-title-block {
@@ -152,13 +156,13 @@
 .card-title-block h2 {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-text-1);
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .card-title-block p {
   font-size: 14px;
-  color: var(--color-text-3);
+  color: var(--text-muted);
 }
 
 /* STATUS TOASTS */
@@ -216,36 +220,36 @@
   left: 14px;
   top: 16px;
   font-size: 20px;
-  color: var(--color-text-3);
+  color: var(--text-muted);
   pointer-events: none;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .input-field {
   width: 100%;
   height: 52px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid var(--color-border);
-  border-radius: 12px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--btn-radius);
   padding: 0 16px 0 44px;
-  color: var(--color-text-1);
+  color: var(--text-primary);
   font-size: 15px;
   outline: none;
-  transition: all 0.2s;
+  transition: var(--transition-fast);
 }
 
 .input-field::placeholder {
-  color: var(--color-text-4);
+  color: var(--text-muted);
 }
 
 .input-field:focus {
-  border-color: var(--color-blue);
-  background: rgba(10, 132, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  border-color: var(--primary);
+  background: var(--primary-glow);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 .input-field:focus + .input-icon {
-  color: var(--color-blue);
+  color: var(--primary);
 }
 
 .input-error {
@@ -273,7 +277,7 @@
 
 .strength-label {
   font-size: 12px;
-  color: var(--color-text-3);
+  color: var(--text-muted);
   display: block;
   margin-bottom: 6px;
   text-transform: capitalize;
@@ -281,7 +285,7 @@
 
 .strength-meter {
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -332,17 +336,17 @@
 .checkbox-indicator-custom {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--color-border);
+  border: 2px solid var(--input-border);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--input-bg);
   display: inline-block;
   position: relative;
-  transition: all 0.15s ease;
+  transition: var(--transition-fast);
 }
 
 .native-checkbox-hidden:checked + .checkbox-indicator-custom {
-  background: var(--color-blue);
-  border-color: var(--color-blue);
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .checkbox-indicator-custom::after {
@@ -365,7 +369,7 @@
 
 .checkbox-label-text {
   font-size: 14px;
-  color: var(--color-text-2);
+  color: var(--text-secondary);
 }
 
 /* ACTIONS */
@@ -379,20 +383,20 @@
 .btn-primary {
   width: 100%;
   height: 52px;
-  background: var(--color-blue);
+  background: var(--btn-primary-bg);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--btn-radius);
   color: white;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-normal);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.2);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .btn-primary::before {
@@ -407,16 +411,13 @@
 }
 
 .btn-primary:hover {
-  background: var(--color-blue-dark);
+  background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 
-    0 8px 24px rgba(10, 132, 255, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 35px var(--primary-glow);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.2);
 }
 
 .btn-primary:disabled {
@@ -429,11 +430,11 @@
 .auth-switch-link {
   text-align: center;
   font-size: 13.5px;
-  color: var(--color-text-3);
+  color: var(--text-secondary);
 }
 
 .auth-switch-link a {
-  color: var(--color-blue);
+  color: var(--primary);
   text-decoration: none;
   font-weight: 500;
 }
@@ -454,7 +455,7 @@
     background-image: 
       radial-gradient(
         circle at 50% 30%,
-        rgba(10, 132, 255, 0.12) 0%,
+        var(--primary-glow) 0%,
         transparent 50%
       );
   }
@@ -462,8 +463,40 @@
   .card-header-branding {
     display: flex;
   }
-  
+}
+
+@media (max-width: 480px) {
   .register-card-frosted {
-    padding: 32px 24px;
+    padding: 28px 20px;
+    border-radius: 16px;
+    box-shadow: none !important;
+    margin: 0;
+    border: none;
+    background: transparent;
   }
+
+  .card-title-block h2 {
+    font-size: 24px;
+  }
+
+  .input-field {
+    height: 50px;
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  }
+
+  .btn-primary {
+    height: 50px;
+    font-size: 16px;
+  }
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon { 
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 18px;
 }

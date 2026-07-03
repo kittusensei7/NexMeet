@@ -86,9 +86,8 @@ const Room = () => {
   const [showEmoji, setShowEmoji] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [floatingEmojis, setFloatingEmojis] = useState([])
-
-  // Compatibility states for JSX
   const [localStream, setLocalStream] = useState(null)
+  const [facingMode, setFacingMode] = useState('user')
 
   const setBitrateForPeer = (peer) => {
     try {
@@ -347,7 +346,6 @@ const Room = () => {
     console.log('=== LEAVE BUTTON CLICKED ===')
 
     // STEP 1: Stop camera/mic IMMEDIATELY
-    // This must happen FIRST
     if (localStreamRef.current) {
       const tracks = localStreamRef.current.getTracks()
       console.log('Found tracks to stop:', tracks.length)
@@ -389,9 +387,32 @@ const Room = () => {
 
     console.log('=== CLEANUP DONE - NAVIGATING NOW ===')
 
-    // STEP 6: Navigate LAST (after everything above)
-    navigate('/dashboard')
+    // STEP 6: Navigate LAST
+    navigate('/dashboard', { replace: true })
   }, [roomId, username, navigate])
+
+  // Intercept back button using popstate
+  useEffect(() => {
+    // Push dummy history entry
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      const confirmLeave = window.confirm('Leave the meeting?');
+      if (confirmLeave) {
+        cleanupAll();
+        navigate('/dashboard', { replace: true });
+      } else {
+        // Push state again to keep user in room
+        window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [cleanupAll, navigate]);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // INIT: Get media then join room
@@ -407,6 +428,7 @@ const Room = () => {
         const stream = await
           navigator.mediaDevices.getUserMedia({
             video: {
+              facingMode: { ideal: 'user' }, // FRONT camera preference
               width: { ideal: 960, max: 1280 },
               height: { ideal: 540, max: 720 },
               frameRate: { ideal: 24, max: 30 }
@@ -726,8 +748,6 @@ const Room = () => {
     const turningOn = !videoTrack.enabled
 
     if (!turningOn) {
-      // Turning OFF - just disable, 
-      // this part works fine
       videoTrack.enabled = false
       setIsCameraOff(true)
       socket.emit('camera-status', {
@@ -737,13 +757,13 @@ const Room = () => {
     }
 
     // Turning ON - get a FRESH track
-    // to avoid frozen-frame bug
     try {
       console.log('[CAMERA] Getting fresh track...')
       
       const freshStream = await
         navigator.mediaDevices.getUserMedia({
           video: {
+            facingMode: { ideal: facingMode },
             width: { ideal: 960, max: 1280 },
             height: { ideal: 540, max: 720 },
             frameRate: { ideal: 24, max: 30 }
@@ -795,14 +815,85 @@ const Room = () => {
       console.error('[CAMERA] Failed to resume:', err)
       showToast('Could not turn camera back on', 'error')
     }
-  }, [roomId, username, showToast])
+  }, [roomId, username, showToast, facingMode])
+
+  const flipCamera = async () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user'
+    
+    try {
+      console.log(`[CAMERA] Flipping camera to: ${newMode}`)
+      
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          facingMode: { exact: newMode },
+          width: { ideal: 960, max: 1280 },
+          height: { ideal: 540, max: 720 },
+          frameRate: { ideal: 24, max: 30 }
+        },
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      })
+
+      const newTrack = newStream.getVideoTracks()[0]
+
+      // Replace in all peers
+      for (const [sid, { peer }] of Object.entries(peersRef.current)) {
+        try {
+          const pc = peer._pc
+          if (!pc) continue
+          const sender = pc.getSenders().find(s => s.track?.kind === 'video')
+          if (sender) {
+            await sender.replaceTrack(newTrack)
+            console.log('[CAMERA-FLIP] Replaced track for peer:', sid)
+          }
+        } catch (e) {
+          console.error('[CAMERA-FLIP] Replace track error for peer:', sid, e)
+        }
+      }
+
+      // Stop old tracks
+      if (localStreamRef.current) {
+        localStreamRef.current.getVideoTracks().forEach(t => t.stop())
+        localStreamRef.current.removeTrack(localStreamRef.current.getVideoTracks()[0])
+        localStreamRef.current.addTrack(newTrack)
+      } else {
+        localStreamRef.current = newStream
+      }
+
+      setLocalStream(newStream)
+
+      // Update local video element
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = newStream
+        localVideoRef.current.play().catch(() => {})
+      }
+
+      setFacingMode(newMode)
+      showToast(`Flipped to ${newMode === 'user' ? 'front' : 'rear'} camera`, 'success')
+    } catch (err) {
+      console.error('[CAMERA-FLIP] Failed to flip:', err)
+      showToast('Camera flip failed', 'error')
+    }
+  }
 
   const stopScreenShare = useCallback(async () => {
     try {
       const camStream = await
         navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
+          video: {
+            facingMode: { ideal: facingMode },
+            width: { ideal: 960, max: 1280 },
+            height: { ideal: 540, max: 720 },
+            frameRate: { ideal: 24, max: 30 }
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
         })
 
       const camTrack = camStream.getVideoTracks()[0]
@@ -844,7 +935,7 @@ const Room = () => {
     } catch (e) {
       console.error('Stop screen share error:', e)
     }
-  }, [roomId, username])
+  }, [roomId, username, facingMode])
 
   const startScreenShare = useCallback(async () => {
     // Check if screen share is supported
@@ -1203,6 +1294,17 @@ const Room = () => {
           </span>
         </button>
 
+        {isMobile && (
+          <button 
+            className="ctrl-btn"
+            onClick={flipCamera}
+            data-tooltip="Flip camera">
+            <span className="material-icons-round">
+              flip_camera_android
+            </span>
+          </button>
+        )}
+
         <button 
           className={`ctrl-btn ${isCaptionOn ? 'active' : ''}`}
           onClick={toggleCaptions}
@@ -1251,7 +1353,7 @@ const Room = () => {
                 gap: '6px',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
                 border: '1px solid rgba(255,255,255,0.15)',
-                zIndex: 2147483647, /* max z-index */
+                zIndex: 2147483647,
                 width: '260px'
               }}>
               {['👍','❤️','😂','😮','👏','🎉','🔥','💯']
@@ -1391,7 +1493,6 @@ const Room = () => {
           messages={messages}
           onSend={sendMessage}
           onClose={() => setShowChat(false)}
-          username={username}
         />
       )}
 
@@ -1472,7 +1573,7 @@ const Room = () => {
 // SUB-COMPONENTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-function ChatPanel({ messages, onSend, onClose, username }) {
+function ChatPanel({ messages, onSend, onClose }) {
   const [text, setText] = useState('')
   const messagesEndRef = useRef(null)
 
@@ -1531,7 +1632,7 @@ function ChatPanel({ messages, onSend, onClose, username }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
-        minHeight: 0  /* CRITICAL: allows flex child to scroll */
+        minHeight: 0
       }}>
         {messages.length === 0 && (
           <p style={{ color: '#666', textAlign: 'center', marginTop: 40 }}>

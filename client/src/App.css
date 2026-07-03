@@ -1,35 +1,40 @@
 /* ========================================================
-   NEXMEET NEW COLOR SYSTEM & DESIGN VARIABLES
+   NEXMEET COLOR SYSTEM & DESIGN VARIABLES
    ======================================================== */
+
 :root,
 [data-theme="dark"] {
-  /* Colors */
   --bg-primary: #020617;
-  --bg-secondary: #0b0f19;
-  --primary: #8B5CF6;
-  --primary-glow: rgba(139, 92, 246, 0.15);
-  
-  --card-bg: rgba(30, 41, 59, 0.45);
-  --card-border: 1px solid rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(255, 255, 255, 0.05);
+  --bg-secondary: #030712;
+  --bg-card: rgba(10, 15, 30, 0.95);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.78);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --border: rgba(255, 255, 255, 0.08);
+  --primary: #8b5cf6;
+  --primary-hover: #a78bfa;
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.12);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  /* Helper Layout Variable Mappings */
+  --primary-glow: rgba(139, 92, 246, 0.15);
+  --card-bg: var(--bg-card);
+  --card-border: 1px solid var(--border);
+  --border-medium: var(--border);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --text-tertiary: var(--text-muted);
 
   /* Glassmorphism */
-  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-bg: rgba(10, 15, 30, 0.75);
   --glass-blur: blur(16px);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: var(--border);
 
   /* Buttons */
   --btn-primary-bg: linear-gradient(135deg, #7c3aed, #a855f7);
   --btn-primary-color: #ffffff;
   --btn-primary-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
-  
-  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
-  --btn-secondary-border: 1px solid rgba(255, 255, 255, 0.1);
+  --btn-secondary-bg: var(--input-bg);
+  --btn-secondary-border: 1px solid var(--input-border);
   
   /* Radii */
   --card-radius: 20px;
@@ -68,32 +73,77 @@
   --btn-padding-x: 24px;
   --card-padding: 32px;
 
-  /* Compatibility with legacy zoom-style design variables */
+  /* Legacy color variables compatibility mapping */
   --color-bg: var(--bg-primary);
-  --color-surface-1: var(--card-bg);
+  --color-surface-1: var(--bg-card);
   --color-surface-2: var(--bg-secondary);
   --color-surface-3: rgba(255, 255, 255, 0.15);
-  
   --color-blue: var(--primary);
   --color-blue-dark: #7c3aed;
   --color-blue-light: var(--primary-glow);
-  
   --color-red: #ef4444;
   --color-green: #10b981;
   --color-yellow: #f59e0b;
   --color-orange: #f97316;
-  
   --color-text-1: var(--text-primary);
   --color-text-2: var(--text-secondary);
-  --color-text-3: var(--text-tertiary);
+  --color-text-3: var(--text-muted);
   --color-text-4: #475569;
-  
-  --color-border: var(--border-medium);
+  --color-border: var(--border);
   --color-border-strong: rgba(255, 255, 255, 0.2);
-  
-  --glass-bg: rgba(15, 23, 42, 0.65);
+}
+
+[data-theme="light"] {
+  --bg-primary: #F0F2F5;
+  --bg-secondary: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --text-primary: #1C1C1E;
+  --text-secondary: #3C3C43;
+  --text-muted: #6C6C70;
+  --border: rgba(0, 0, 0, 0.12);
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --input-bg: rgba(0, 0, 0, 0.05);
+  --input-border: rgba(0, 0, 0, 0.15);
+
+  /* Helper Layout Variable Mappings */
+  --primary-glow: rgba(124, 58, 237, 0.1);
+  --card-bg: var(--bg-card);
+  --card-border: 1px solid var(--border);
+  --border-medium: var(--border);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --text-tertiary: var(--text-muted);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(240, 242, 245, 0.85);
   --glass-blur: blur(16px);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: var(--border);
+
+  /* Buttons */
+  --btn-primary-bg: linear-gradient(135deg, #7c3aed, #6d28d9);
+  --btn-primary-color: #ffffff;
+  --btn-primary-shadow: 0 4px 14px rgba(124, 58, 237, 0.2);
+  --btn-secondary-bg: var(--input-bg);
+  --btn-secondary-border: 1px solid var(--input-border);
+
+  /* Legacy color variables compatibility mapping */
+  --color-bg: var(--bg-primary);
+  --color-surface-1: var(--bg-card);
+  --color-surface-2: var(--bg-secondary);
+  --color-surface-3: #e2e8f0;
+  --color-blue: var(--primary);
+  --color-blue-dark: var(--primary-hover);
+  --color-blue-light: var(--primary-glow);
+  --color-red: #ef4444;
+  --color-green: #10b981;
+  --color-yellow: #f59e0b;
+  --color-orange: #f97316;
+  --color-text-1: var(--text-primary);
+  --color-text-2: var(--text-secondary);
+  --color-text-3: var(--text-muted);
+  --color-text-4: #94a3b8;
+  --color-border: var(--border);
+  --color-border-strong: rgba(0, 0, 0, 0.2);
 }
 
 /* Base resets & typography */
@@ -113,7 +163,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* TYPOGRAPHY UPDATES */
+/* Typography elements */
 h1 { font-size: var(--font-size-3xl); }
 h2 { font-size: var(--font-size-2xl); }
 h3 { font-size: var(--font-size-xl); }
@@ -122,7 +172,7 @@ p {
   color: var(--text-secondary); 
 }
 
-/* CARD UPDATES */
+/* Card layout helper classes */
 .card, .glass-card {
   background: var(--card-bg) !important;
   padding: var(--card-padding) !important;
@@ -131,17 +181,17 @@ p {
   box-shadow: var(--card-shadow) !important;
 }
 
-/* HOVER EFFECTS */
+/* Hover effects */
 .card:hover, .glass-card:hover, .login-card-frosted:hover, .action-card:hover {
   transform: translateY(-6px) !important;
-  border-color: rgba(139,92,246,0.25) !important;
-  box-shadow: 0 0 40px rgba(139,92,246,0.12) !important;
+  border-color: rgba(139, 92, 246, 0.25) !important;
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.12) !important;
   transition: var(--transition-normal) !important;
 }
 
 .btn-primary:hover, .btn-google-primary:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 0 35px rgba(139,92,246,0.40) !important;
+  box-shadow: 0 0 35px rgba(139, 92, 246, 0.40) !important;
   transition: var(--transition-normal) !important;
 }
 
@@ -149,28 +199,49 @@ p {
   transform: scale(0.98) !important;
 }
 
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* Animations */
 @keyframes glowPulse {
   0% { box-shadow: 0 0 0 rgba(139,92,246,0.15); }
   50% { box-shadow: 0 0 30px rgba(139,92,246,0.35); }
   100% { box-shadow: 0 0 0 rgba(139,92,246,0.15); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+.spin-icon { 
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 18px;
+}
+
+/* Reusable Spinner Component Styles */
+.loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: var(--primary, #8b5cf6);
+  border-radius: 50%;
+  animation: spinnerRotate 0.8s linear infinite;
+  display: inline-block;
+}
+
+.loading-spinner.small {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
 }
 
 /* Glassmorphism Styles */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border-left: 1px solid var(--border-medium);
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.3);
   transition: var(--transition-normal);
@@ -204,94 +275,8 @@ p {
 .spinner-small {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid var(--border-medium);
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ========================================================
-   LIGHT THEME OVERRIDES
-   ======================================================== */
-[data-theme="light"],
-body.light-theme {
-  --bg-primary: #f1f5f9;
-  --bg-secondary: #e2e8f0;
-  --primary: #7c3aed;
-  --primary-glow: rgba(124, 58, 237, 0.1);
-  
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --card-border: 1px solid rgba(0, 0, 0, 0.08);
-  --border-medium: rgba(0, 0, 0, 0.1);
-  --border-subtle: rgba(0, 0, 0, 0.05);
-
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-
-  --glass-bg: rgba(241, 245, 249, 0.85);
-  --glass-blur: blur(16px);
-  --glass-border: rgba(0, 0, 0, 0.08);
-
-  /* Legacy color variables compatibility mapping for light theme */
-  --color-bg: var(--bg-primary);
-  --color-surface-1: var(--card-bg);
-  --color-surface-2: var(--bg-secondary);
-  --color-surface-3: #e2e8f0;
-  
-  --color-blue: var(--primary);
-  --color-blue-dark: #6d28d9;
-  --color-blue-light: var(--primary-glow);
-  
-  --color-red: #ef4444;
-  --color-green: #10b981;
-  --color-yellow: #f59e0b;
-  --color-orange: #f97316;
-  
-  --color-text-1: var(--text-primary);
-  --color-text-2: var(--text-secondary);
-  --color-text-3: var(--text-tertiary);
-  --color-text-4: #94a3b8;
-  
-  --color-border: var(--border-medium);
-  --color-border-strong: rgba(0, 0, 0, 0.2);
-}
-
-/* Safety guard: auth pages always render in dark theme */
-[data-theme="light"] .login-container-page,
-[data-theme="light"] .register-container-page,
-body.light-theme .login-container-page,
-body.light-theme .register-container-page {
-  --bg-primary: #020617;
-  --bg-secondary: #0b0f19;
-  --primary: #8B5CF6;
-  --primary-glow: rgba(139, 92, 246, 0.15);
-  --card-bg: rgba(30, 41, 59, 0.45);
-  --card-border: 1px solid rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --glass-bg: rgba(15, 23, 42, 0.65);
-  --glass-blur: blur(16px);
-  --glass-border: rgba(255, 255, 255, 0.08);
-
-  /* Legacy color variables compatibility mapping overrides for auth pages */
-  --color-bg: var(--bg-primary);
-  --color-surface-1: var(--card-bg);
-  --color-surface-2: var(--bg-secondary);
-  --color-surface-3: rgba(255, 255, 255, 0.15);
-  --color-blue: var(--primary);
-  --color-blue-dark: #7c3aed;
-  --color-blue-light: var(--primary-glow);
-  --color-text-1: var(--text-primary);
-  --color-text-2: var(--text-secondary);
-  --color-text-3: var(--text-tertiary);
-  --color-border: var(--border-medium);
-}
-

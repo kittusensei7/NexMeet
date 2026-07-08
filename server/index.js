@@ -29,6 +29,7 @@ app.use(express.json());
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
+app.use('/api/livekit', require('./routes/livekit'));
 
 // Health Check Endpoint
 app.get('/', (req, res) => {

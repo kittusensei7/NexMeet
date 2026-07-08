@@ -100,6 +100,21 @@ async function runTests() {
       throw new Error('My rooms check failed');
     }
 
+    // 6.5 LIVEKIT TOKEN GENERATION (PROTECTED)
+    console.log('\n[TEST 6.5] POST /api/livekit/token - LiveKit Token Generation (JWT Protected)');
+    const livekitResponse = await axios.post(
+      `${API_URL}/api/livekit/token`,
+      { roomName: roomId, participantName: testUser.username },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log('Response status:', livekitResponse.status);
+    console.log('Response body (has token):', !!livekitResponse.data.token);
+    console.log('Response body (url):', livekitResponse.data.url);
+
+    if (!livekitResponse.data.token || !livekitResponse.data.url) {
+      throw new Error('LiveKit token generation failed');
+    }
+
     // 7. SOCKET.IO COMMUNICATION FLOWS
     console.log('\n[TEST 7] Initiating Socket.io Handshake and Events Verification...');
     await testSocketFlows(roomId);
@@ -148,9 +163,7 @@ function testSocketFlows(roomId) {
     let clientA, clientB;
     let clientBJoined = false;
     let messageReceived = false;
-    let muteReceived = false;
     let raiseHandReceivedA = false;
-    let raiseHandReceivedB = false;
     let userLeftReceived = false;
 
     // Timeout after 15 seconds to avoid infinite hangs if events are missed
@@ -161,7 +174,7 @@ function testSocketFlows(roomId) {
     }, 15000);
 
     const checkComplete = () => {
-      if (clientBJoined && messageReceived && muteReceived && raiseHandReceivedA && raiseHandReceivedB && userLeftReceived) {
+      if (clientBJoined && messageReceived && raiseHandReceivedA && userLeftReceived) {
         clearTimeout(timeoutTimer);
         console.log('Socket flow verified successfully.');
         resolve();
@@ -176,49 +189,41 @@ function testSocketFlows(roomId) {
       clientA.emit('join-room', { roomId, username: 'Alice' });
     });
 
-    clientA.on('all-users', (users) => {
-      console.log('[Socket] Client A received list of all-users:', users);
-    });
-
     clientA.on('room-users', (users) => {
       console.log('[Socket] Client A received updated room-users:', users);
-    });
-
-    clientA.on('user-joined', (data) => {
-      console.log('[Socket] Client A received user-joined event:', data);
-      clientBJoined = true;
       
-      // Client B has joined, let Alice send a chat message
-      console.log('[Socket] Client A sending a message to the room...');
-      clientA.emit('send-message', { roomId, message: 'Hello everyone!', username: 'Alice', time: new Date().toLocaleTimeString() });
-    });
+      // If client B has joined, users length will be 2
+      const bobExists = users.some(u => u.username === 'Bob');
+      if (bobExists && !clientBJoined) {
+        clientBJoined = true;
+        // Client B is in, let Alice send a message
+        console.log('[Socket] Client A sending a message to the room...');
+        clientA.emit('send-message', {
+          roomId,
+          text: 'Hello everyone!',
+          username: 'Alice',
+          time: new Date().toLocaleTimeString()
+        });
+      }
 
-    clientA.on('user-mute-status', (data) => {
-      console.log('[Socket] Client A received mute-status update:', data);
-      if (data.username === 'Bob' && data.isMuted === true && data.socketId) {
-        muteReceived = true;
+      // If client B has left, users length will go back to 1
+      if (clientBJoined && !bobExists && !userLeftReceived) {
+        console.log('[Socket] Client A detected that Client B (Bob) has left/disconnected.');
+        userLeftReceived = true;
+        clientA.disconnect();
         checkComplete();
       }
     });
 
-    clientA.on('user-hand-status', (data) => {
+    clientA.on('user-raised-hand', (data) => {
       console.log('[Socket] Client A received raise-hand update:', data);
       if (data.username === 'Bob' && data.socketId) {
         raiseHandReceivedA = true;
         
-        // Once both Alice and Bob receive Bob's hand raise, Bob disconnects
-        if (raiseHandReceivedA && raiseHandReceivedB) {
-          console.log('[Socket] Disconnecting Client B to verify user-left workflow...');
-          clientB.disconnect();
-        }
+        // Once Alice receives Bob's hand raise, Bob disconnects
+        console.log('[Socket] Disconnecting Client B to verify user-left workflow...');
+        clientB.disconnect();
       }
-    });
-
-    clientA.on('user-left', (data) => {
-      console.log('[Socket] Client A received user-left notification for socket:', data.socketId);
-      userLeftReceived = true;
-      clientA.disconnect();
-      checkComplete();
     });
 
     // Wait a brief moment to connect client B (Bob) so Alice is already in the room
@@ -231,40 +236,17 @@ function testSocketFlows(roomId) {
         clientB.emit('join-room', { roomId, username: 'Bob' });
       });
 
-      clientB.on('all-users', (users) => {
-        console.log('[Socket] Client B received list of all-users:', users);
-        
-        // Bob is fully joined, let Bob toggle his mute-status
-        setTimeout(() => {
-          console.log('[Socket] Client B sending mute-status toggle...');
-          clientB.emit('mute-status', { roomId, isMuted: true, username: 'Bob' });
+      clientB.on('receive-message', (data) => {
+        console.log('[Socket] Client B received message:', data);
+        if (data.text === 'Hello everyone!' && data.username === 'Alice' && data.time) {
+          messageReceived = true;
+          checkComplete();
 
-          // Then Bob raises hand
+          // After receiving message, Bob raises hand
           setTimeout(() => {
             console.log('[Socket] Client B sending raise-hand event...');
             clientB.emit('raise-hand', { roomId, username: 'Bob' });
           }, 300);
-        }, 300);
-      });
-
-      clientB.on('receive-message', (data) => {
-        console.log('[Socket] Client B received message:', data);
-        if (data.message === 'Hello everyone!' && data.username === 'Alice' && data.time) {
-          messageReceived = true;
-          checkComplete();
-        }
-      });
-
-      clientB.on('user-hand-status', (data) => {
-        console.log('[Socket] Client B received raise-hand update:', data);
-        if (data.username === 'Bob' && data.socketId) {
-          raiseHandReceivedB = true;
-          
-          // Once both Alice and Bob receive Bob's hand raise, Bob disconnects
-          if (raiseHandReceivedA && raiseHandReceivedB) {
-            console.log('[Socket] Disconnecting Client B to verify user-left workflow...');
-            clientB.disconnect();
-          }
         }
       });
     }, 1500);

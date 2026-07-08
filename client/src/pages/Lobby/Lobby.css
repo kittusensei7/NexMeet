@@ -560,29 +560,61 @@
 }
 
 @media (max-width: 768px) {
-  .lobby-container, .lobby-container-page {
-    flex-direction: column;
-    overflow-y: auto;
-    height: auto;
+  .lobby-container-page,
+  .lobby-container {
     min-height: 100dvh;
-    padding: 16px;
-    gap: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .lobby-content-layout {
-    grid-template-columns: 1fr;
-    padding: 16px 8px;
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    min-height: 100dvh;
+    height: auto;
   }
 
-  .lobby-preview-pane, .lobby-preview {
+  .lobby-preview-pane {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .camera-preview-box {
     width: 100%;
     aspect-ratio: 4/3;
     border-radius: 16px;
+    max-height: 40vh;
+    object-fit: cover;
   }
 
-  .lobby-join-panel, .lobby-join-pane {
+  .preview-control-buttons {
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .lobby-join-pane {
     width: 100%;
     padding: 0;
+  }
+
+  .join-room-title {
+    font-size: 20px;
+  }
+
+  .btn-join-gradient,
+  .btn-present-secondary {
+    width: 100%;
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .lobby-link-box {
+    width: 100%;
+  }
+
+  .lobby-link-input {
+    font-size: 12px;
   }
 }

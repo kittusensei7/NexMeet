@@ -127,7 +127,6 @@
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
   box-shadow: var(--card-shadow);
-  animation: none; /* Removed heavy animations for instant perceived speed */
   transition: var(--transition-normal);
 }
 
@@ -451,7 +450,7 @@
   
   .register-form-side {
     flex: 0 0 100%;
-    padding: 24px;
+    padding: 20px 16px;
     background-image: 
       radial-gradient(
         circle at 50% 30%,
@@ -466,27 +465,40 @@
 }
 
 @media (max-width: 480px) {
+  .register-container-page {
+    padding: 20px 16px;
+  }
+
+  .register-form-side {
+    padding: 0;
+  }
+
   .register-card-frosted {
     padding: 28px 20px;
     border-radius: 16px;
     box-shadow: none !important;
     margin: 0;
-    border: none;
-    background: transparent;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
   }
 
   .card-title-block h2 {
     font-size: 24px;
   }
 
-  .input-field {
-    height: 50px;
-    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  .card-title-block p {
+    font-size: 14px;
   }
 
+  .input-field,
   .btn-primary {
-    height: 50px;
-    font-size: 16px;
+    height: 52px;
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+    border-radius: 12px;
+  }
+
+  .branding-title {
+    font-size: 28px;
   }
 }
 

@@ -25,16 +25,12 @@ router.post('/token', authMiddleware, async (req, res) => {
       })
     }
 
-    // Make identity unique per device
-    // So same user can join from multiple devices without conflict
-    const uniqueIdentity = `${participantName}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
-
     const at = new AccessToken(
       process.env.LIVEKIT_API_KEY,
       process.env.LIVEKIT_API_SECRET,
       {
-        identity: uniqueIdentity,
-        name: participantName, // Display name stays clean
+        identity: `${participantName}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        name: participantName, // This shows in UI
         ttl: '2h'
       }
     )

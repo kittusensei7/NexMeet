@@ -280,3 +280,30 @@ p {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
+
+/* Global Mobile CSS Overrides */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent iOS input zoom */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Safe area support for notched phones (iPhone etc) */
+.room-top-bar {
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+
+.controls-bar {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}

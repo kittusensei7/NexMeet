@@ -13,8 +13,39 @@ import './Room.css'
 const Room = () => {
   const { roomId } = useParams()
   const navigate = useNavigate()
-  const username = localStorage.getItem('username') || 'Guest'
-  const authToken = localStorage.getItem('token')
+  const getUserName = () => {
+    // Try all possible storage patterns
+    const direct = localStorage.getItem('username') || sessionStorage.getItem('username')
+    if (direct) return direct
+
+    const userStr = localStorage.getItem('user') || sessionStorage.getItem('nexmeet_user') || localStorage.getItem('nexmeet_user')
+    if (userStr) {
+      try {
+        const parsed = JSON.parse(userStr)
+        return parsed.username || 
+               parsed.name || 
+               parsed.email?.split('@')[0]
+      } catch (err) {
+        console.warn('Failed to parse user session JSON:', err)
+      }
+    }
+
+    const userInfoStr = 
+      localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo')
+    if (userInfoStr) {
+      try {
+        const parsed = JSON.parse(userInfoStr)
+        return parsed.username || parsed.name
+      } catch (err) {
+        console.warn('Failed to parse user info JSON:', err)
+      }
+    }
+
+    return 'User'
+  }
+
+  const username = getUserName()
+  const authToken = localStorage.getItem('token') || sessionStorage.getItem('nexmeet_token') || localStorage.getItem('nexmeet_token')
 
   const [livekitToken, setLivekitToken] = useState(null)
   const [livekitUrl, setLivekitUrl] = useState(null)

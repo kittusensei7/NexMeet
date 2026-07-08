@@ -29,8 +29,12 @@ const Room = () => {
   const [captions, setCaptions] = useState({})
   const [showEmoji, setShowEmoji] = useState(false)
   const [floatingEmojis, setFloatingEmojis] = useState([])
+  const [facingMode, setFacingMode] = useState('user')
   const recognitionRef = useRef(null)
   const isCaptionOnRef = useRef(false)
+  const roomRef = useRef(null)
+
+  const isMobileDevice = /Android|iPhone|iPad/i.test(navigator.userAgent)
 
   const showToast = useCallback((msg, type = 'info') => {
     const id = Date.now() + Math.random()
@@ -39,6 +43,25 @@ const Room = () => {
       setToasts(prev => prev.filter(t => t.id !== id))
     }, 4000)
   }, [])
+
+  const flipCamera = async () => {
+    try {
+      const newMode = facingMode === 'user' ? 'environment' : 'user'
+      const room = roomRef.current
+      if (!room) return
+
+      const localParticipant = room.localParticipant
+      await localParticipant.switchActiveDevice(
+        'videoinput',
+        newMode === 'user' ? 'front' : 'back'
+      )
+      setFacingMode(newMode)
+      showToast(newMode === 'user' ? 'Front camera' : 'Back camera')
+    } catch (err) {
+      console.error('Camera flip error:', err)
+      showToast('Camera flip failed', 'error')
+    }
+  }
 
   // Get LiveKit token from backend
   useEffect(() => {
@@ -261,8 +284,36 @@ const Room = () => {
         token={livekitToken}
         serverUrl={livekitUrl}
         onDisconnected={handleDisconnected}
+        onConnected={(room) => {
+          roomRef.current = room
+          console.log('Connected to LiveKit room')
+        }}
+        options={{
+          publishDefaults: {
+            videoEncoding: {
+              maxBitrate: 600_000,
+              maxFramerate: 24,
+            },
+            videoSimulcastLayers: [],
+          },
+          videoCaptureDefaults: {
+            facingMode: 'user', // FRONT camera
+            resolution: {
+              width: 960,
+              height: 540,
+              frameRate: 24,
+            }
+          },
+          audioCaptureDefaults: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+          adaptiveStream: true,
+          dynacast: true,
+        }}
         data-lk-theme="default"
-        style={{ height: '100vh' }}
+        style={{ height: '100dvh' }}
       >
         <VideoConference />
         
@@ -301,6 +352,15 @@ const Room = () => {
             }}>
             Share link
           </button>
+          {isMobileDevice && (
+            <button
+              className="share-link-btn"
+              onClick={flipCamera}
+              title="Flip camera"
+            >
+              🔄
+            </button>
+          )}
           <button
             className={`ctrl-btn ${isCaptionOn ? 'active' : ''}`}
             onClick={toggleCaptions}>

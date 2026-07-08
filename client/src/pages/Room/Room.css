@@ -284,19 +284,81 @@
   border-radius: 100px; 
 }
 
+/* Fix viewport height for mobile browsers with address bar */
+.lk-room-container {
+  height: 100vh;
+  height: 100dvh;
+}
+
 /* Media query fixes for mobile */
 @media (max-width: 768px) {
-  .room-top-bar {
-    padding: 6px 12px;
-    font-size: 11px;
-    width: 90%;
-    justify-content: center;
+  .lk-room-container {
+    height: 100dvh !important;
+    width: 100vw !important;
   }
+
+  /* Make control bar scrollable on small screens */
+  .lk-control-bar {
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important;
+    padding: 8px 12px !important;
+    gap: 6px !important;
+  }
+
+  .lk-control-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Smaller buttons on mobile */
+  .lk-button {
+    min-width: 44px !important;
+    height: 44px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+  }
+
+  /* Top bar: stack or scroll on mobile */
+  .room-top-bar {
+    top: 8px;
+    padding: 6px 12px;
+    gap: 6px;
+    font-size: 11px;
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+    justify-content: flex-start;
+    border-radius: 12px;
+  }
+
+  .share-link-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* LiveKit video grid on mobile */
+  .lk-grid-layout {
+    padding: 60px 4px 80px 4px !important;
+  }
+
+  .lk-focus-layout {
+    padding: 60px 4px 80px 4px !important;
+  }
+
   .toast-container {
     bottom: 100px;
   }
+
   .caption-overlay {
     bottom: 110px;
     width: 90%;
+  }
+}
+
+/* Hide button labels on very small screens to save space */
+@media (max-width: 380px) {
+  .lk-button span:not(.lk-icon) {
+    display: none !important;
   }
 }
